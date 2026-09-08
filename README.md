@@ -17,7 +17,7 @@ A free, open-source tool to create stunning, high-converting screenshots for the
 
 - **6 realistic device mockups** — iPhone 15 Pro Max, iPhone 15 Pro, iPhone 14, iPad Pro 12.9", Samsung Galaxy S24 Ultra, Samsung Galaxy Tab S9
 - **Multiple color options per device** — Black Titanium, Natural, Blue, White, and more
-- **Multi-device compositions** — add, select, reorder, and style multiple independent devices inside a single screenshot
+- **Zero-to-many device compositions** — create text-only screenshots, or add, select, reorder, and style any number of independent devices
 - **Independent device instances** — each device keeps its own screen image, model, color, transform, 3D angles, and shadow
 - **Cross-screen device overflow** — drag devices past the left or right edge to continue them into adjacent screenshots
 - **Flat & 3D rendering modes** — toggle between a classic 2D frame and a perspective 3D view with visible device edges
@@ -32,7 +32,8 @@ A free, open-source tool to create stunning, high-converting screenshots for the
 
 ### 📝 Rich Text & Fonts
 
-- **Rich text editor** for headlines and subheadlines — bold, italic, underline, text color, alignment (left/center/right), and text background highlights
+- **Multiple text layers** — add any number of independent headlines and subheadlines to each screenshot
+- **Rich text editor** for every headline and subheadline — bold, italic, underline, text color, alignment (left/center/right), and text background highlights
 - **Rounded highlight styling** — highlighted text uses padded, rounded backgrounds that match in the editor, preview, and export
 - **Google Fonts integration** — search and preview hundreds of fonts
 - **Independent sizing** — separate font size sliders for headline and subheadline
@@ -168,11 +169,11 @@ src/
 
 ## 🎯 Usage
 
-1. **Select a device** — pick from iPhones, iPads, or Samsung devices in the left sidebar
-2. **Choose a color** — select a device frame color
-3. **Upload a screenshot** — add your app's screenshot to the device screen
-4. **Add more devices** — build multi-device layouts and customize each frame independently
-5. **Edit text** — click headlines/subheadlines to type, use the rich text toolbar to format and highlight text
+1. **Choose your composition** — keep a screenshot device-free or add one or more device frames
+2. **Select a device** — pick from iPhones, iPads, or Samsung devices in the left sidebar
+3. **Choose a color** — select a device frame color
+4. **Upload screenshots** — attach a different screen image to each device frame
+5. **Add text layers** — add as many headlines and subheadlines as you need, then format and position each one independently
 6. **Pick a font** — browse Google Fonts to find the perfect typeface
 7. **Set a background** — choose a solid color or gradient preset
 8. **Position the device** — use presets or manually adjust size, position, rotation, and shadow

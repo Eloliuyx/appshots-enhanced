@@ -157,43 +157,42 @@ export const ScreenshotCard = ({
           />
         ))}
 
-        {/* Headline */}
-        <TextElement
-          type="headline"
-          content={screenshot.headline}
-          x={screenshot.headlineX}
-          y={screenshot.headlineY}
-          width={screenshot.headlineWidth}
-          fontSize={headlineFontSize / 3}
-          color={screenshot.textColor}
-          fontFamily={screenshot.fontFamily}
-          isSelected={
-            isActive &&
-            isElementSelected(selectedElement, "headline", screenshot.id)
-          }
-          isInteractive={isActive}
-          onMouseDown={(e) => onElementMouseDown(e, "headline", screenshot.id)}
-        />
-
-        {/* Subheadline */}
-        <TextElement
-          type="subheadline"
-          content={screenshot.subheadline}
-          x={screenshot.subheadlineX}
-          y={screenshot.subheadlineY}
-          width={screenshot.subheadlineWidth}
-          fontSize={subheadlineFontSize / 3}
-          color={screenshot.textColor}
-          fontFamily={screenshot.fontFamily}
-          isSelected={
-            isActive &&
-            isElementSelected(selectedElement, "subheadline", screenshot.id)
-          }
-          isInteractive={isActive}
-          onMouseDown={(e) =>
-            onElementMouseDown(e, "subheadline", screenshot.id)
-          }
-        />
+        {/* Independent headline and subheadline layers */}
+        {screenshot.textLayers.map((textLayer) => (
+          <TextElement
+            key={textLayer.id}
+            type={textLayer.type}
+            content={textLayer.content}
+            x={textLayer.x}
+            y={textLayer.y}
+            width={textLayer.width}
+            fontSize={
+              (textLayer.type === "headline"
+                ? headlineFontSize
+                : subheadlineFontSize) / 3
+            }
+            color={screenshot.textColor}
+            fontFamily={screenshot.fontFamily}
+            isSelected={
+              isActive &&
+              isElementSelected(
+                selectedElement,
+                textLayer.type,
+                screenshot.id,
+                textLayer.id,
+              )
+            }
+            isInteractive={isActive}
+            onMouseDown={(e) =>
+              onElementMouseDown(
+                e,
+                textLayer.type,
+                screenshot.id,
+                textLayer.id,
+              )
+            }
+          />
+        ))}
 
         {/* Devices, including visible overflow from neighboring screenshots */}
         {renderableDevices.map(({ device, localX, ownerScreenshotId }, index) => (

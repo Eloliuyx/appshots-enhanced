@@ -104,4 +104,14 @@ describe("ensureDeviceInstances", () => {
     });
     expect(activeDeviceId).toBe("device-a");
   });
+
+  it("preserves an explicit device-free screenshot", () => {
+    const result = ensureDeviceInstances({
+      devices: [],
+      activeDeviceId: "removed-device",
+    });
+
+    expect(result.devices).toEqual([]);
+    expect(result.activeDeviceId).toBeNull();
+  });
 });

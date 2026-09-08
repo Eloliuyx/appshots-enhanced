@@ -90,7 +90,7 @@ export const ensureDeviceInstances = (
   screenshot: LegacyDeviceFields,
   fallbackDeviceId: string = devices[0].id,
   fallbackColorId: string = devices[0].colors[0].id,
-): { devices: DeviceInstance[]; activeDeviceId: string } => {
+): { devices: DeviceInstance[]; activeDeviceId: string | null } => {
   const fallbackDevice = getDeviceSpecById(fallbackDeviceId);
   const fallbackColor = getDeviceColorById(fallbackDevice.id, fallbackColorId);
 
@@ -128,10 +128,9 @@ export const ensureDeviceInstances = (
         )
     : [];
 
-  const devicesList =
-    normalizedDevices.length > 0
-      ? normalizedDevices
-      : [
+  const devicesList = Array.isArray(screenshot.devices)
+    ? normalizedDevices
+    : [
           createDeviceInstance({
             deviceId: fallbackDevice.id,
             colorId: fallbackColor.id,
@@ -168,7 +167,7 @@ export const ensureDeviceInstances = (
     typeof screenshot.activeDeviceId === "string" &&
     devicesList.some((device) => device.id === screenshot.activeDeviceId)
       ? screenshot.activeDeviceId
-      : devicesList[0].id;
+      : (devicesList[0]?.id ?? null);
 
   return { devices: devicesList, activeDeviceId };
 };

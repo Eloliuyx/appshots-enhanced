@@ -17,6 +17,8 @@ import type {
   ShadowConfig,
   Project,
   SelectedElement,
+  TextLayer,
+  TextLayerType,
 } from "../types";
 import { devices, exportSizes, gradientPresets } from "../constants";
 import { exportScreenshots } from "../lib/export-utils";
@@ -33,6 +35,11 @@ import {
   clearPersistedState,
 } from "../lib/useLocalStorage";
 import { moveByOffset, reorderById } from "../lib/screenshot-order";
+import {
+  createTextLayer,
+  ensureTextLayers,
+  withTextLayers,
+} from "../lib/text-layers";
 
 const HISTORY_LIMIT = 100;
 const HISTORY_COALESCE_DELAY = 300;
@@ -120,11 +127,14 @@ interface EditorContextType {
   selectedDevice: DeviceSpec;
   selectedColor: DeviceColor;
   activeScreenshot: Screenshot;
-  activeDevice: DeviceInstance;
+  activeDevice: DeviceInstance | null;
   exportSize: ExportSize;
 
   // Actions
   updateActiveScreenshot: (updates: Partial<Screenshot>) => void;
+  addTextLayer: (type: TextLayerType) => void;
+  updateTextLayer: (id: string, updates: Partial<TextLayer>) => void;
+  removeTextLayer: (id: string) => void;
   addScreenshot: () => void;
   removeScreenshot: (id: string) => void;
   handleElementMouseDown: (
@@ -185,12 +195,25 @@ const createDefaultScreenshot = (
     deviceId: defaultDeviceId,
     colorId: defaultColorId,
   });
+  const headline = createTextLayer("headline", {
+    content: "Showcase Your App",
+    x: 50,
+    y: 10,
+    width: 80,
+  });
+  const subheadline = createTextLayer("subheadline", {
+    content:
+      "Create stunning App Store screenshots in minutes. Customizable templates, devices, and backgrounds.",
+    x: 50,
+    y: 18,
+    width: 80,
+  });
 
   return {
     id: generateId(),
-    headline: "Showcase Your App",
-    subheadline:
-      "Create stunning App Store screenshots in minutes. Customizable templates, devices, and backgrounds.",
+    textLayers: [headline, subheadline],
+    headline: headline.content,
+    subheadline: subheadline.content,
     backgroundColor: "#8b5cf6",
     backgroundMode: "solid",
     gradientPresetId: null,
@@ -231,13 +254,20 @@ const normalizeScreenshot = (
     fallbackColorId,
   );
 
-  return {
+  const normalizedScreenshot: Screenshot = {
     ...baseScreenshot,
     ...rest,
     overlayImages: screenshot.overlayImages ?? [],
     devices: deviceInstances,
     activeDeviceId,
   };
+  return withTextLayers(
+    normalizedScreenshot,
+    ensureTextLayers({
+      ...normalizedScreenshot,
+      textLayers: screenshot.textLayers,
+    }),
+  );
 };
 
 const normalizeProject = (project: Project): Project => {
@@ -690,7 +720,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const activeDevice =
     activeScreenshot.devices.find(
       (device) => device.id === activeScreenshot.activeDeviceId,
-    ) || activeScreenshot.devices[0];
+    ) ?? activeScreenshot.devices[0] ?? null;
   const exportSize =
     exportSizes.find((s) => s.id === exportSizeId) || exportSizes[0];
 
@@ -709,6 +739,75 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     },
     [activeScreenshotId, updateScreenshotById],
   );
+
+  const updateTextLayerByScreenshotId = useCallback(
+    (
+      screenshotId: string,
+      textLayerId: string,
+      updates: Partial<TextLayer>,
+    ) => {
+      setScreenshotsState((current) =>
+        current.map((screenshot) => {
+          if (screenshot.id !== screenshotId) return screenshot;
+          const textLayers = screenshot.textLayers.map((layer) =>
+            layer.id === textLayerId ? { ...layer, ...updates } : layer,
+          );
+          return withTextLayers(screenshot, textLayers);
+        }),
+      );
+    },
+    [],
+  );
+
+  const addTextLayer = (type: TextLayerType) => {
+    let nextY = type === "headline" ? 10 : 18;
+    while (
+      nextY < 82 &&
+      activeScreenshot.textLayers.some(
+        (layer) => Math.abs(layer.y - nextY) < 9,
+      )
+    ) {
+      nextY += 10;
+    }
+    const layer = createTextLayer(type, {
+      y: Math.min(nextY, 82),
+    });
+    setScreenshotsState((current) =>
+      current.map((screenshot) =>
+        screenshot.id === activeScreenshotId
+          ? withTextLayers(screenshot, [...screenshot.textLayers, layer])
+          : screenshot,
+      ),
+    );
+    setSelectedElement({
+      type,
+      id: layer.id,
+      screenshotId: activeScreenshotId,
+    });
+  };
+
+  const updateTextLayer = (id: string, updates: Partial<TextLayer>) => {
+    updateTextLayerByScreenshotId(activeScreenshotId, id, updates);
+  };
+
+  const removeTextLayer = (id: string) => {
+    setScreenshotsState((current) =>
+      current.map((screenshot) =>
+        screenshot.id === activeScreenshotId
+          ? withTextLayers(
+              screenshot,
+              screenshot.textLayers.filter((layer) => layer.id !== id),
+            )
+          : screenshot,
+      ),
+    );
+    if (
+      selectedElement?.screenshotId === activeScreenshotId &&
+      selectedElement.id === id
+    ) {
+      setSelectedElement(null);
+    }
+  };
 
   useEffect(() => {
     if (!activeDevice) return;
@@ -730,10 +829,18 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   ]);
 
   const addScreenshot = () => {
+    const headline = createTextLayer("headline", { content: "New Screenshot" });
+    const subheadline = createTextLayer("subheadline", {
+      content: "Add your description here",
+    });
+    const clonedDevices = activeScreenshot.devices.map((device) =>
+      cloneDeviceInstance(device, { id: generateId() }),
+    );
     const newScreenshot: Screenshot = {
       id: generateId(),
-      headline: "New Screenshot",
-      subheadline: "Add your description here",
+      textLayers: [headline, subheadline],
+      headline: headline.content,
+      subheadline: subheadline.content,
       backgroundColor: activeScreenshot.backgroundColor,
       backgroundMode: activeScreenshot.backgroundMode,
       gradientPresetId: activeScreenshot.gradientPresetId,
@@ -746,12 +853,9 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
       subheadlineWidth: 80,
       fontFamily: activeScreenshot.fontFamily,
       overlayImages: [],
-      devices: activeScreenshot.devices.map((device) =>
-        cloneDeviceInstance(device, { id: generateId() }),
-      ),
-      activeDeviceId: activeScreenshot.devices[0]?.id ?? generateId(),
+      devices: clonedDevices,
+      activeDeviceId: clonedDevices[0]?.id ?? null,
     };
-    newScreenshot.activeDeviceId = newScreenshot.devices[0].id;
     setScreenshots([...screenshots, newScreenshot]);
     setActiveScreenshotId(newScreenshot.id);
   };
@@ -793,16 +897,13 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
       if (device) {
         dragStartElementPos.current = { x: device.x, y: device.y };
       }
-    } else if (type === "headline") {
-      dragStartElementPos.current = {
-        x: targetScreenshot.headlineX,
-        y: targetScreenshot.headlineY,
-      };
-    } else if (type === "subheadline") {
-      dragStartElementPos.current = {
-        x: targetScreenshot.subheadlineX,
-        y: targetScreenshot.subheadlineY,
-      };
+    } else if ((type === "headline" || type === "subheadline") && id) {
+      const textLayer = targetScreenshot.textLayers.find(
+        (layer) => layer.id === id,
+      );
+      if (textLayer) {
+        dragStartElementPos.current = { x: textLayer.x, y: textLayer.y };
+      }
     } else if (type === "image" && id) {
       const image = targetScreenshot.overlayImages.find((img) => img.id === id);
       if (image) {
@@ -816,16 +917,16 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
     const { x: newX, y: newY } = pendingUpdate.current;
 
-    if (selectedElement.type === "headline") {
-      updateScreenshotById(selectedElement.screenshotId, {
-        headlineX: newX,
-        headlineY: newY,
-      });
-    } else if (selectedElement.type === "subheadline") {
-      updateScreenshotById(selectedElement.screenshotId, {
-        subheadlineX: newX,
-        subheadlineY: newY,
-      });
+    if (
+      (selectedElement.type === "headline" ||
+        selectedElement.type === "subheadline") &&
+      selectedElement.id
+    ) {
+      updateTextLayerByScreenshotId(
+        selectedElement.screenshotId,
+        selectedElement.id,
+        { x: newX, y: newY },
+      );
     } else if (selectedElement.type === "image" && selectedElement.id) {
       const targetScreenshot = screenshots.find(
         (screenshot) => screenshot.id === selectedElement.screenshotId,
@@ -854,7 +955,12 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
     pendingUpdate.current = null;
     rafId.current = null;
-  }, [screenshots, selectedElement, updateScreenshotById]);
+  }, [
+    screenshots,
+    selectedElement,
+    updateScreenshotById,
+    updateTextLayerByScreenshotId,
+  ]);
 
   const handleElementMouseMove = useCallback(
     (e: MouseEvent) => {
@@ -1082,14 +1188,12 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeDevice = (deviceId: string) => {
-    if (activeScreenshot.devices.length <= 1) return;
-
     const nextDevices = activeScreenshot.devices.filter(
       (device) => device.id !== deviceId,
     );
     const nextActiveDeviceId =
       activeScreenshot.activeDeviceId === deviceId
-        ? nextDevices[Math.max(0, nextDevices.length - 1)].id
+        ? (nextDevices.at(-1)?.id ?? null)
         : activeScreenshot.activeDeviceId;
 
     updateActiveScreenshot({
@@ -1102,11 +1206,15 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
       selectedElement.screenshotId === activeScreenshot.id &&
       selectedElement.id === deviceId
     ) {
-      setSelectedElement({
-        type: "device",
-        id: nextActiveDeviceId,
-        screenshotId: activeScreenshot.id,
-      });
+      setSelectedElement(
+        nextActiveDeviceId
+          ? {
+              type: "device",
+              id: nextActiveDeviceId,
+              screenshotId: activeScreenshot.id,
+            }
+          : null,
+      );
     }
   };
 
@@ -1143,7 +1251,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file || !activeDevice) return;
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result;
@@ -1255,6 +1363,9 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         activeDevice,
         exportSize,
         updateActiveScreenshot,
+        addTextLayer,
+        updateTextLayer,
+        removeTextLayer,
         addScreenshot,
         removeScreenshot,
         handleElementMouseDown,

@@ -1002,39 +1002,22 @@ export const exportScreenshots = async ({
     const exportHeadlineFontSize = (headlineFontSize / 3) * scaleX;
     const exportSubheadlineFontSize = (subheadlineFontSize / 3) * scaleX;
     const lineHeight = 1.1;
-    const headlineMaxWidth =
-      canvas.width * (screenshot.headlineWidth / 100) - paddingX;
-    const subheadlineMaxWidth =
-      canvas.width * (screenshot.subheadlineWidth / 100) - paddingX;
-    const headlineX = canvas.width * (screenshot.headlineX / 100);
-    const headlineTextY = canvas.height * (screenshot.headlineY / 100);
-
-    drawRichText(ctx, screenshot.headline, {
-      x: headlineX,
-      y: headlineTextY,
-      maxWidth: headlineMaxWidth,
-      fontSize: exportHeadlineFontSize,
-      fontFamily,
-      defaultColor: screenshot.textColor,
-      lineHeight,
-      textAlign: "center",
-      fontWeight: 700,
-    });
-
-    const subheadlineX = canvas.width * (screenshot.subheadlineX / 100);
-    const subheadlineTextY = canvas.height * (screenshot.subheadlineY / 100);
-
-    drawRichText(ctx, screenshot.subheadline, {
-      x: subheadlineX,
-      y: subheadlineTextY,
-      maxWidth: subheadlineMaxWidth,
-      fontSize: exportSubheadlineFontSize,
-      fontFamily,
-      defaultColor: screenshot.textColor,
-      lineHeight,
-      textAlign: "center",
-      fontWeight: 600,
-    });
+    for (const textLayer of screenshot.textLayers) {
+      drawRichText(ctx, textLayer.content, {
+        x: canvas.width * (textLayer.x / 100),
+        y: canvas.height * (textLayer.y / 100),
+        maxWidth: canvas.width * (textLayer.width / 100) - paddingX,
+        fontSize:
+          textLayer.type === "headline"
+            ? exportHeadlineFontSize
+            : exportSubheadlineFontSize,
+        fontFamily,
+        defaultColor: screenshot.textColor,
+        lineHeight,
+        textAlign: "center",
+        fontWeight: textLayer.type === "headline" ? 700 : 600,
+      });
+    }
 
     // Draw overlay images in front of device
     await drawOverlayImages("front");

@@ -72,8 +72,21 @@ export type DeviceInstance = {
   rotateX: number;
 };
 
+export type TextLayerType = "headline" | "subheadline";
+
+export type TextLayer = {
+  id: string;
+  type: TextLayerType;
+  content: string;
+  x: number;
+  y: number;
+  width: number;
+};
+
 export type Screenshot = {
   id: string;
+  /** Canonical text model. Legacy fields below mirror the first layer by type. */
+  textLayers: TextLayer[];
   headline: string;
   subheadline: string;
   backgroundColor: string;
@@ -89,7 +102,7 @@ export type Screenshot = {
   fontFamily: string;
   overlayImages: ImageOverlay[];
   devices: DeviceInstance[];
-  activeDeviceId: string;
+  activeDeviceId: string | null;
 };
 
 export type SelectedElement = {

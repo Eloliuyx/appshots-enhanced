@@ -27,10 +27,15 @@ export const DeviceInstancesSection = ({
         + Add Device
       </button>
       <p className="text-[11px] leading-4 text-gray-500">
-        Drag a device past the left or right edge to span adjacent screenshots.
+        Add any number of device images, or keep this screenshot device-free.
       </p>
 
       <div className="space-y-2 mt-3">
+        {screenshot.devices.length === 0 && (
+          <div className="rounded-lg border border-dashed border-white/15 px-3 py-4 text-center text-xs leading-5 text-gray-500">
+            No devices on this screenshot.
+          </div>
+        )}
         {screenshot.devices.map((device, index) => {
           const spec = getDeviceSpecById(device.deviceId);
           const isSelected = screenshot.activeDeviceId === device.id;
@@ -81,9 +86,9 @@ export const DeviceInstancesSection = ({
                     e.stopPropagation();
                     onRemoveDevice(device.id);
                   }}
-                  disabled={screenshot.devices.length === 1}
                   className={STYLES.iconButtonDelete}
-                  title="Remove"
+                  title="Remove device"
+                  aria-label={`Remove ${spec.label}`}
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>

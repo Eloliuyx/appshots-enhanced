@@ -58,6 +58,9 @@ export const RightSidebar = () => {
     sendDeviceBackward,
     bringImageForward,
     sendImageBackward,
+    addTextLayer,
+    updateTextLayer,
+    removeTextLayer,
   } = useEditor();
 
   return (
@@ -72,43 +75,59 @@ export const RightSidebar = () => {
           onSendBackward={sendDeviceBackward}
         />
 
-        <ScreenshotImageSection
-          device={activeDevice}
-          fileInputRef={fileInputRef}
-          onFileUpload={handleFileUpload}
-        />
+        {activeDevice && (
+          <>
+            <ScreenshotImageSection
+              device={activeDevice}
+              fileInputRef={fileInputRef}
+              onFileUpload={handleFileUpload}
+            />
 
-        <PositionPresets
-          device={activeDevice}
-          onUpdateDevice={(updates) =>
-            updateActiveScreenshot({
-              devices: activeScreenshot.devices.map((device) =>
-                device.id === activeDevice.id ? { ...device, ...updates } : device,
-              ),
-            })
-          }
-        />
+            <PositionPresets
+              device={activeDevice}
+              onUpdateDevice={(updates) =>
+                updateActiveScreenshot({
+                  devices: activeScreenshot.devices.map((device) =>
+                    device.id === activeDevice.id
+                      ? { ...device, ...updates }
+                      : device,
+                  ),
+                })
+              }
+            />
 
-        <LayoutSection
-          device={activeDevice}
-          screenshot={activeScreenshot}
-          headlineFontSize={headlineFontSize}
-          subheadlineFontSize={subheadlineFontSize}
-          onUpdateDevice={(updates) =>
-            updateActiveScreenshot({
-              devices: activeScreenshot.devices.map((device) =>
-                device.id === activeDevice.id ? { ...device, ...updates } : device,
-              ),
-            })
-          }
-          onUpdateScreenshot={updateActiveScreenshot}
-          onHeadlineSizeChange={setHeadlineFontSize}
-          onSubheadlineSizeChange={setSubheadlineFontSize}
-        />
+            <LayoutSection
+              device={activeDevice}
+              onUpdateDevice={(updates) =>
+                updateActiveScreenshot({
+                  devices: activeScreenshot.devices.map((device) =>
+                    device.id === activeDevice.id
+                      ? { ...device, ...updates }
+                      : device,
+                  ),
+                })
+              }
+            />
+          </>
+        )}
 
         <ContentSection
           screenshot={activeScreenshot}
-          onUpdateScreenshot={updateActiveScreenshot}
+          selectedElement={selectedElement}
+          onAddTextLayer={addTextLayer}
+          onUpdateTextLayer={updateTextLayer}
+          onRemoveTextLayer={removeTextLayer}
+          onSelectTextLayer={(layer) =>
+            setSelectedElement({
+              type: layer.type,
+              id: layer.id,
+              screenshotId: activeScreenshot.id,
+            })
+          }
+          headlineFontSize={headlineFontSize}
+          subheadlineFontSize={subheadlineFontSize}
+          onHeadlineSizeChange={setHeadlineFontSize}
+          onSubheadlineSizeChange={setSubheadlineFontSize}
         />
 
         <AppearanceSection

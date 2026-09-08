@@ -34,8 +34,9 @@ describe("getRenderableDevicesForScreenshot", () => {
         id: "screen-2",
         devices: [createDeviceInstance({ id: "device-b", x: 50, scale: 50 })],
       },
-    ].map((screenshot) => ({
-      headline: "",
+].map((screenshot) => ({
+  textLayers: [],
+  headline: "",
       subheadline: "",
       backgroundColor: "#000000",
       backgroundMode: "solid" as const,
