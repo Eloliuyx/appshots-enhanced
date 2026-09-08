@@ -108,6 +108,12 @@ bun run dev
 
 The app will be available at `http://localhost:5173`
 
+### Personal workbench on macOS
+
+Double-click `Start AppShots.command` to start the private local workbench and
+open it at `http://127.0.0.1:5173`. Keep the Terminal window open while using
+the editor; closing it stops the local site. Nothing is deployed to the web.
+
 ### Building for Production
 
 ```bash

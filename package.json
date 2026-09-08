@@ -3,10 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun --bun vite dev",
-    "build": "bun --bun vite build && tsc",
-    "preview": "bun --bun vite preview",
-    "test": "bun --bun vitest run"
+    "dev": "vite dev",
+    "build": "vite build && tsc",
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.6",
