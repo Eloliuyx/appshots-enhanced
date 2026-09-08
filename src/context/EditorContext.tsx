@@ -32,6 +32,42 @@ import {
   useEditorPersistence,
   clearPersistedState,
 } from "../lib/useLocalStorage";
+import { moveByOffset, reorderById } from "../lib/screenshot-order";
+
+const HISTORY_LIMIT = 100;
+const HISTORY_COALESCE_DELAY = 300;
+
+type EditorHistorySnapshot = {
+  screenshots: Screenshot[];
+  activeScreenshotId: string;
+  headlineFontSize: number;
+  subheadlineFontSize: number;
+};
+
+type EditorHistory = {
+  past: EditorHistorySnapshot[];
+  current: EditorHistorySnapshot;
+  future: EditorHistorySnapshot[];
+  isCoalescing: boolean;
+};
+
+const isNativeUndoTarget = (target: EventTarget | null) => {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.closest("[contenteditable='true']")) return true;
+  if (target instanceof HTMLTextAreaElement) return true;
+  if (!(target instanceof HTMLInputElement)) return false;
+
+  return ![
+    "button",
+    "checkbox",
+    "color",
+    "file",
+    "radio",
+    "range",
+    "reset",
+    "submit",
+  ].includes(target.type);
+};
 
 function generateId() {
   return Math.random().toString(36).substring(2, 9);
@@ -60,6 +96,8 @@ interface EditorContextType {
   setExportSizeId: (id: string) => void;
   screenshots: Screenshot[];
   setScreenshots: (screenshots: Screenshot[]) => void;
+  reorderScreenshots: (sourceId: string, targetId: string) => void;
+  moveScreenshot: (id: string, offset: number) => void;
   activeScreenshotId: string;
   setActiveScreenshotId: (id: string) => void;
   selectedElement: SelectedElement | null;
@@ -119,6 +157,10 @@ interface EditorContextType {
   handleExport: () => void;
   getBackgroundStyle: (screenshot: Screenshot) => string;
   resetEditor: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  undo: () => void;
+  redo: () => void;
 }
 
 const EditorContext = createContext<EditorContextType | undefined>(undefined);
@@ -293,6 +335,37 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     activeProject.subheadlineFontSize,
   );
 
+  const createHistorySnapshot = useCallback(
+    (): EditorHistorySnapshot => ({
+      screenshots,
+      activeScreenshotId,
+      headlineFontSize,
+      subheadlineFontSize,
+    }),
+    [
+      activeScreenshotId,
+      headlineFontSize,
+      screenshots,
+      subheadlineFontSize,
+    ],
+  );
+
+  const historyRef = useRef<EditorHistory>({
+    past: [],
+    current: {
+      screenshots,
+      activeScreenshotId,
+      headlineFontSize,
+      subheadlineFontSize,
+    },
+    future: [],
+    isCoalescing: false,
+  });
+  const historyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isApplyingHistoryRef = useRef(false);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+
   const [selectedElement, setSelectedElement] = useState<SelectedElement | null>(
     null,
   );
@@ -314,6 +387,147 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const previewRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
+
+  const syncHistoryAvailability = useCallback(() => {
+    setCanUndo(historyRef.current.past.length > 0);
+    setCanRedo(historyRef.current.future.length > 0);
+  }, []);
+
+  const closeHistoryGroup = useCallback(() => {
+    if (historyTimerRef.current) {
+      clearTimeout(historyTimerRef.current);
+      historyTimerRef.current = null;
+    }
+    historyRef.current.isCoalescing = false;
+  }, []);
+
+  const resetHistory = useCallback(
+    (snapshot: EditorHistorySnapshot) => {
+      closeHistoryGroup();
+      historyRef.current = {
+        past: [],
+        current: snapshot,
+        future: [],
+        isCoalescing: false,
+      };
+      setCanUndo(false);
+      setCanRedo(false);
+    },
+    [closeHistoryGroup],
+  );
+
+  const restoreHistorySnapshot = useCallback(
+    (snapshot: EditorHistorySnapshot) => {
+      isApplyingHistoryRef.current = true;
+      setScreenshotsState(snapshot.screenshots);
+      setActiveScreenshotIdState(snapshot.activeScreenshotId);
+      setHeadlineFontSizeState(snapshot.headlineFontSize);
+      setSubheadlineFontSizeState(snapshot.subheadlineFontSize);
+      setSelectedElement(null);
+
+      const active =
+        snapshot.screenshots.find(
+          (screenshot) => screenshot.id === snapshot.activeScreenshotId,
+        ) ?? snapshot.screenshots[0];
+      const activeDevice =
+        active?.devices.find((device) => device.id === active.activeDeviceId) ??
+        active?.devices[0];
+      if (activeDevice) {
+        setSelectedDeviceIdState(activeDevice.deviceId);
+        setSelectedColorIdState(activeDevice.colorId);
+      }
+    },
+    [],
+  );
+
+  const undo = useCallback(() => {
+    closeHistoryGroup();
+    const history = historyRef.current;
+    const previous = history.past.at(-1);
+    if (!previous) return;
+
+    history.past = history.past.slice(0, -1);
+    history.future = [history.current, ...history.future];
+    history.current = previous;
+    restoreHistorySnapshot(previous);
+    syncHistoryAvailability();
+  }, [closeHistoryGroup, restoreHistorySnapshot, syncHistoryAvailability]);
+
+  const redo = useCallback(() => {
+    closeHistoryGroup();
+    const history = historyRef.current;
+    const next = history.future[0];
+    if (!next) return;
+
+    history.future = history.future.slice(1);
+    history.past = [...history.past, history.current].slice(-HISTORY_LIMIT);
+    history.current = next;
+    restoreHistorySnapshot(next);
+    syncHistoryAvailability();
+  }, [closeHistoryGroup, restoreHistorySnapshot, syncHistoryAvailability]);
+
+  useEffect(() => {
+    const nextSnapshot = createHistorySnapshot();
+    const history = historyRef.current;
+
+    if (isApplyingHistoryRef.current) {
+      isApplyingHistoryRef.current = false;
+      history.current = nextSnapshot;
+      return;
+    }
+
+    const designChanged =
+      history.current.screenshots !== nextSnapshot.screenshots ||
+      history.current.headlineFontSize !== nextSnapshot.headlineFontSize ||
+      history.current.subheadlineFontSize !== nextSnapshot.subheadlineFontSize;
+
+    if (!designChanged) {
+      history.current = nextSnapshot;
+      return;
+    }
+
+    if (!history.isCoalescing) {
+      history.past = [...history.past, history.current].slice(-HISTORY_LIMIT);
+    }
+    history.current = nextSnapshot;
+    history.future = [];
+    history.isCoalescing = true;
+
+    if (historyTimerRef.current) clearTimeout(historyTimerRef.current);
+    historyTimerRef.current = setTimeout(() => {
+      historyRef.current.isCoalescing = false;
+      historyTimerRef.current = null;
+    }, HISTORY_COALESCE_DELAY);
+
+    syncHistoryAvailability();
+  }, [createHistorySnapshot, syncHistoryAvailability]);
+
+  useEffect(
+    () => () => {
+      if (historyTimerRef.current) clearTimeout(historyTimerRef.current);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (isNativeUndoTarget(event.target)) return;
+      if (!event.metaKey && !event.ctrlKey) return;
+
+      const key = event.key.toLowerCase();
+      if (key === "z") {
+        event.preventDefault();
+        if (event.shiftKey) redo();
+        else undo();
+      } else if (key === "y" && event.ctrlKey && !event.metaKey) {
+        event.preventDefault();
+        redo();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [redo, undo]);
 
   // Sync project state when local state changes
   const updateProjectState = useCallback(() => {
@@ -399,6 +613,12 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const setScreenshots = (newScreenshots: Screenshot[]) => {
     setScreenshotsState(newScreenshots);
   };
+  const reorderScreenshots = (sourceId: string, targetId: string) => {
+    setScreenshotsState((current) => reorderById(current, sourceId, targetId));
+  };
+  const moveScreenshot = (id: string, offset: number) => {
+    setScreenshotsState((current) => moveByOffset(current, id, offset));
+  };
   const setActiveScreenshotId = (id: string) => {
     setActiveScreenshotIdState(id);
   };
@@ -452,6 +672,13 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     setHeadlineFontSizeState(project.headlineFontSize);
     setSubheadlineFontSizeState(project.subheadlineFontSize);
     setSelectedElement(null);
+    isApplyingHistoryRef.current = true;
+    resetHistory({
+      screenshots: project.screenshots,
+      activeScreenshotId: project.activeScreenshotId,
+      headlineFontSize: project.headlineFontSize,
+      subheadlineFontSize: project.subheadlineFontSize,
+    });
   };
 
   const selectedDevice =
@@ -972,6 +1199,13 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     setSubheadlineFontSizeState(defaultProject.subheadlineFontSize);
     setSelectedElement(null);
     setIsStarModalOpen(false);
+    isApplyingHistoryRef.current = true;
+    resetHistory({
+      screenshots: defaultProject.screenshots,
+      activeScreenshotId: defaultProject.activeScreenshotId,
+      headlineFontSize: defaultProject.headlineFontSize,
+      subheadlineFontSize: defaultProject.subheadlineFontSize,
+    });
   };
 
   return (
@@ -998,6 +1232,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         setExportSizeId,
         screenshots,
         setScreenshots,
+        reorderScreenshots,
+        moveScreenshot,
         activeScreenshotId,
         setActiveScreenshotId,
         selectedElement,
@@ -1043,6 +1279,10 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         handleExport,
         getBackgroundStyle,
         resetEditor,
+        canUndo,
+        canRedo,
+        undo,
+        redo,
       }}
     >
       {children}

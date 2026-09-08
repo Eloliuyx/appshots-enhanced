@@ -13,6 +13,7 @@ import { TextElement } from "./TextElement";
 import { DeviceContainer } from "./DeviceContainer";
 import { isElementSelected } from "./utils";
 import { Z_INDEX } from "./constants";
+import { OrderControls } from "./OrderControls";
 
 interface ScreenshotCardProps {
   /** Screenshot data */
@@ -50,6 +51,12 @@ interface ScreenshotCardProps {
   ) => void;
   /** Handler for element mouse up */
   onElementMouseUp: () => void;
+  position: number;
+  canMoveLeft: boolean;
+  canMoveRight: boolean;
+  onMoveLeft: () => void;
+  onMoveRight: () => void;
+  onOrderPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => void;
 }
 
 /**
@@ -76,6 +83,12 @@ export const ScreenshotCard = ({
   onDeselect,
   onElementMouseDown,
   onElementMouseUp,
+  position,
+  canMoveLeft,
+  canMoveRight,
+  onMoveLeft,
+  onMoveRight,
+  onOrderPointerDown,
 }: ScreenshotCardProps) => {
   // Split overlay images by layer
   const behindImages = screenshot.overlayImages.filter(
@@ -113,6 +126,15 @@ export const ScreenshotCard = ({
     >
       {/* Remove button */}
       {canRemove && <RemoveButton onRemove={onRemove} />}
+
+      <OrderControls
+        position={position}
+        canMoveLeft={canMoveLeft}
+        canMoveRight={canMoveRight}
+        onMoveLeft={onMoveLeft}
+        onMoveRight={onMoveRight}
+        onReorderPointerDown={onOrderPointerDown}
+      />
 
       {/* Content layer */}
       <div className="absolute inset-0 select-none">

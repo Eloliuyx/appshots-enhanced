@@ -77,6 +77,8 @@ A free, open-source tool to create stunning, high-converting screenshots for the
 ### 🖥️ Editor Experience
 
 - **Multi-screenshot gallery** — add, remove, and navigate screenshots in a horizontal carousel
+- **Undo & redo** — recover editor changes with toolbar controls, `Cmd/Ctrl+Z`, and `Cmd/Ctrl+Shift+Z`
+- **Screenshot reordering** — drag screenshots into a new order or move them left and right with accessible controls
 - **Real-time preview** — all changes update instantly on the canvas
 - **Drag-and-drop** — reposition any element by dragging directly on the canvas
 - **Device manager** — add, select, remove, and reorder devices from the right sidebar
