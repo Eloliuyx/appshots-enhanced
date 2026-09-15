@@ -18,13 +18,9 @@ A local, browser-based workbench for App Store and Google Play marketing screens
 
 https://github.com/user-attachments/assets/74698402-7942-4cef-86d7-95a28e5bbae3
 
-建议全屏观看，并打开播放器声音以收听旁白。视频保留完整演示，已压缩为适合网页播放的版本。
+建议全屏观看，并打开播放器声音以收听旁白。
 
-Watch in full screen for readable controls, and enable sound for the narration. This web-friendly version preserves the complete walkthrough.
-
-原项目的在线演示不包含本 fork 的全部增强功能，因此不再把它作为本版本的 Live Demo。无需部署网站即可使用下方的本地工作台。
-
-The upstream live demo does not contain all of this fork's enhancements, so it is no longer presented as this version's live demo. No website deployment is needed to use the local workbench below.
+Watch in full screen for readable controls, and enable sound for the narration.
 
 ## 中文说明
 
