@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * ScreenshotImageSection Component
  *
@@ -19,8 +20,10 @@ export const ScreenshotImageSection = ({
   device,
   fileInputRef,
   onFileUpload,
-}: ScreenshotImageSectionProps) => (
-  <SidebarSection title="Device Screen Image">
+}: ScreenshotImageSectionProps) => {
+  const { t } = useLanguage();
+  return (
+  <SidebarSection title={t("Device Screen Image")}>
     <input
       ref={fileInputRef}
       type="file"
@@ -32,12 +35,12 @@ export const ScreenshotImageSection = ({
       onClick={() => fileInputRef.current?.click()}
       className={STYLES.uploadButton}
     >
-      {device.screenshotSrc ? "Replace Image" : "Upload Image"}
+      {device.screenshotSrc ? t("Replace Image") : t("Upload Image")}
     </button>
     {device.screenshotSrc && (
       <p className="mt-2 text-xs leading-5 text-zinc-500">
-        Keeps the current size, position, rotation, and layer.
-      </p>
+        {t("Keeps the current size, position, rotation, and layer.")}</p>
     )}
   </SidebarSection>
 );
+};

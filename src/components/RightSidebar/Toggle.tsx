@@ -23,6 +23,9 @@ export const Toggle = ({ label, enabled, onChange }: ToggleProps) => (
   <div className="flex items-center justify-between">
     <span className={STYLES.label}>{label}</span>
     <button
+      type="button"
+      aria-label={label}
+      aria-pressed={enabled}
       onClick={() => onChange(!enabled)}
       className={`${STYLES.toggle} ${enabled ? STYLES.toggleActive : STYLES.toggleInactive}`}
     >

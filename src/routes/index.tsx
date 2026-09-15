@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { loadGoogleFonts } from "../lib/google-fonts";
 import { EditorProvider } from "../context/EditorContext";
 import { EditorLayout } from "../components/EditorLayout";
+import { LanguageProvider } from "../context/LanguageContext";
 
 const RouteComponent = () => {
   useEffect(() => {
@@ -10,9 +11,11 @@ const RouteComponent = () => {
   }, []);
 
   return (
-    <EditorProvider>
-      <EditorLayout />
-    </EditorProvider>
+    <LanguageProvider>
+      <EditorProvider>
+        <EditorLayout />
+      </EditorProvider>
+    </LanguageProvider>
   );
 };
 

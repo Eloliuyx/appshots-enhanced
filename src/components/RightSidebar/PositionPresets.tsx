@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * PositionPresets Component
  *
@@ -162,6 +163,7 @@ export const PositionPresets = ({
   device,
   onUpdateDevice,
 }: PositionPresetsProps) => {
+  const { t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(true);
 
   // Determine active preset based on current settings
@@ -191,7 +193,7 @@ export const PositionPresets = ({
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-center justify-between p-4 hover:bg-zinc-800/50 transition-colors"
       >
-        <span className="text-sm font-medium text-white">Position Presets</span>
+        <span className="text-sm font-medium text-white">{t("Position Presets")}</span>
         {isExpanded ? (
           <ChevronUp className="w-4 h-4 text-zinc-400" />
         ) : (
@@ -225,7 +227,7 @@ export const PositionPresets = ({
                       isActive ? "text-violet-400" : "text-zinc-400"
                     }`}
                   >
-                    {preset.label}
+                    {t(preset.label)}
                   </span>
                 </button>
               );

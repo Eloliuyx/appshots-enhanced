@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * Toolbar Component
  *
@@ -40,6 +41,7 @@ export const Toolbar = ({
   onRedo,
   onImportFinishedScreenshots,
 }: ToolbarProps) => {
+  const { t, language, setLanguage } = useLanguage();
   const importInputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -50,8 +52,7 @@ export const Toolbar = ({
         className="flex items-center gap-1.5 bg-white hover:bg-neutral-200 text-black text-sm font-medium px-3 py-1.5 rounded-md transition-colors"
       >
         <Plus className="w-4 h-4" />
-        Add Screenshot
-      </button>
+        {t("Add Screenshot")}</button>
       <input
         ref={importInputRef}
         type="file"
@@ -61,28 +62,29 @@ export const Toolbar = ({
         onChange={(event) => {
           const files = Array.from(event.target.files ?? []);
           event.target.value = "";
-          if (files.length > 0) void onImportFinishedScreenshots(files);
+          if (files.length > 0) void onImportFinishedScreenshots(files).catch((error: unknown) => {
+            window.alert(t(error instanceof Error ? error.message : "Could not import these images."));
+          });
         }}
       />
       <button
         type="button"
         onClick={() => importInputRef.current?.click()}
         className="flex items-center gap-1.5 rounded-md border border-white/15 px-3 py-1.5 text-sm font-medium text-zinc-200 transition-colors hover:bg-white/10 hover:text-white"
-        title="Add exported PNGs as full, flattened screenshots"
+        title={t("Add exported PNGs as full, flattened screenshots")}
       >
         <ImagePlus className="h-4 w-4" />
-        Import Finished PNGs
-      </button>
+        {t("Import Finished PNGs")}</button>
     </div>
     <div className="h-5 w-px bg-white/10" />
-    <div className="flex items-center gap-1" aria-label="Edit history">
+    <div className="flex items-center gap-1" aria-label={t("Edit history")}>
       <button
         type="button"
         onClick={onUndo}
         disabled={!canUndo}
         className="rounded-md p-2 text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
-        aria-label="Undo"
-        title="Undo (⌘/Ctrl Z)"
+        aria-label={t("Undo")}
+        title={t("Undo (⌘/Ctrl Z)")}
       >
         <Undo2 className="h-4 w-4" />
       </button>
@@ -91,15 +93,24 @@ export const Toolbar = ({
         onClick={onRedo}
         disabled={!canRedo}
         className="rounded-md p-2 text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
-        aria-label="Redo"
-        title="Redo (⌘/Ctrl Shift Z)"
+        aria-label={t("Redo")}
+        title={t("Redo (⌘/Ctrl Shift Z)")}
       >
         <Redo2 className="h-4 w-4" />
       </button>
     </div>
     <div className="flex-1" />
-    <span className="text-xs text-gray-400">
-      {screenshotCount} screenshot{screenshotCount !== 1 ? "s" : ""}
+    <div role="group" aria-label={t("Interface language")} className="flex shrink-0 gap-0.5 rounded-lg border border-white/15 bg-zinc-900 p-0.5">
+      {(["en", "zh"] as const).map((option) => (
+        <button key={option} type="button" lang={option === "zh" ? "zh-CN" : "en"}
+          aria-pressed={language === option} onClick={() => setLanguage(option)}
+          className={`rounded-md px-2.5 py-1 text-xs transition-colors ${language === option ? "bg-white text-black" : "text-zinc-400 hover:text-white"}`}>
+          {option === "zh" ? "中文" : "EN"}
+        </button>
+      ))}
+    </div>
+    <span className="shrink-0 whitespace-nowrap text-xs text-gray-400">
+      {t(screenshotCount === 1 ? "{0} screenshot" : "{0} screenshots", [screenshotCount])}
     </span>
   </div>
   );

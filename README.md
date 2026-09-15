@@ -66,6 +66,7 @@ A free, open-source tool to create stunning, high-converting screenshots for the
 
 - **Multiple projects** — create, rename, switch between, and delete projects
 - **Auto-save** — projects, settings and custom fonts persist in localStorage and IndexedDB across sessions; IndexedDB also handles workspaces too large for localStorage
+- **English / Chinese interface** — use **EN / 中文** beside the screenshot count to translate editor controls, instructions, project menus and font dialogs. The choice is remembered on this browser origin. Screenshot artwork, project names, uploaded images and font names stay unchanged; no workspace migration is required.
 - **Editable project copies** — copy an existing project's layers and settings into another project
 - **Workspace JSON backup / restore** — export editable projects, embedded images and custom fonts from the project menu; importing adds projects without replacing existing ones
 - **Finished PNG import** — recover downloaded artwork as flattened image layers (the original text/device layers cannot be recovered from PNGs)

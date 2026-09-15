@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * CanvasPreview Component
  *
@@ -28,6 +29,7 @@ import { useEffect, useRef, useState } from "react";
  * <CanvasPreview />
  */
 export const CanvasPreview = () => {
+  const { t } = useLanguage();
   const {
     screenshots,
     activeScreenshotId,
@@ -127,14 +129,14 @@ export const CanvasPreview = () => {
         onImportFinishedScreenshots={importFinishedScreenshots}
       />
 
-      <nav aria-label="Select screenshot" className="flex shrink-0 gap-2 overflow-x-auto border-b border-white/10 bg-[#141414] px-4 py-2">
+      <nav aria-label={t("Select screenshot")} className="flex shrink-0 gap-2 overflow-x-auto border-b border-white/10 bg-[#141414] px-4 py-2">
         {screenshots.map((screenshot, index) => (
           <button key={screenshot.id} type="button"
-            aria-label={`Select screenshot ${index + 1}`}
+            aria-label={t("Select screenshot {0}", [index + 1])}
             aria-pressed={activeScreenshotId === screenshot.id}
             onClick={() => { setActiveScreenshotId(screenshot.id); setSelectedElement(null); }}
             className={`shrink-0 rounded-md border px-3 py-1 text-xs ${activeScreenshotId === screenshot.id ? "border-white bg-white text-black" : "border-white/15 text-zinc-300 hover:bg-white/10"}`}>
-            Screenshot {index + 1}
+            {t("Screenshot {0}", [index + 1])}
           </button>
         ))}
       </nav>

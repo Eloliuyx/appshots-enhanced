@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * ShadowControls Component
  *
@@ -31,14 +32,16 @@ export const ShadowControls = ({
   onColorChange,
   onBlurChange,
   onOffsetYChange,
-}: ShadowControlsProps) => (
+}: ShadowControlsProps) => {
+  const { t } = useLanguage();
+  return (
   <div className="space-y-2 pt-2 border-t border-white/10">
-    <Toggle label="Shadow" enabled={shadow.enabled} onChange={onToggle} />
+    <Toggle label={t("Shadow")} enabled={shadow.enabled} onChange={onToggle} />
 
     {shadow.enabled && (
       <>
         <div className="flex items-center gap-2">
-          <span className={STYLES.labelSmall}>Color</span>
+          <span className={STYLES.labelSmall}>{t("Color")}</span>
           <input
             type="color"
             value={shadow.color}
@@ -48,7 +51,7 @@ export const ShadowControls = ({
         </div>
 
         <RangeSlider
-          label="Blur"
+          label={t("Blur")}
           value={shadow.blur}
           min={SLIDER_RANGES.shadowBlur.min}
           max={SLIDER_RANGES.shadowBlur.max}
@@ -57,7 +60,7 @@ export const ShadowControls = ({
         />
 
         <RangeSlider
-          label="Offset Y"
+          label={t("Offset Y")}
           value={shadow.offsetY}
           min={SLIDER_RANGES.shadowOffset.min}
           max={SLIDER_RANGES.shadowOffset.max}
@@ -68,3 +71,4 @@ export const ShadowControls = ({
     )}
   </div>
 );
+};

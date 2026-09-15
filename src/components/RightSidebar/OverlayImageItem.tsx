@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * OverlayImageItem Component
  *
@@ -24,7 +25,9 @@ export const OverlayImageItem = ({
   onRemove,
   onMoveForward,
   onMoveBackward,
-}: OverlayImageItemProps) => (
+}: OverlayImageItemProps) => {
+  const { t } = useLanguage();
+  return (
   <div
     onClick={onSelect}
     className={`${STYLES.overlayItem} ${
@@ -33,13 +36,13 @@ export const OverlayImageItem = ({
   >
     <img
       src={image.src}
-      alt={`Overlay ${index + 1}`}
+      alt={t("Overlay {0}", [index + 1])}
       className={STYLES.overlayThumbnail}
     />
     <div className="flex-1 min-w-0">
-      <p className="text-xs text-gray-300 truncate">Image {index + 1}</p>
+      <p className="text-xs text-gray-300 truncate">{t("Image {0}", [index + 1])}</p>
       <p className="text-[10px] text-gray-500">
-        Layer {index + 1} of {totalCount}
+        {t("Layer {0} of {1}", [index + 1, totalCount])}
       </p>
     </div>
     <div className="flex items-center gap-1">
@@ -50,7 +53,7 @@ export const OverlayImageItem = ({
         }}
         disabled={index === 0}
         className={STYLES.iconButton}
-        title="Send backward"
+        title={t("Send backward")}
       >
         <ArrowDown className="w-3.5 h-3.5" />
       </button>
@@ -61,7 +64,7 @@ export const OverlayImageItem = ({
         }}
         disabled={index === totalCount - 1}
         className={STYLES.iconButton}
-        title="Bring forward"
+        title={t("Bring forward")}
       >
         <ArrowUp className="w-3.5 h-3.5" />
       </button>
@@ -71,10 +74,11 @@ export const OverlayImageItem = ({
           onRemove();
         }}
         className={STYLES.iconButtonDelete}
-        title="Remove"
+        title={t("Remove")}
       >
         <X className="w-3.5 h-3.5" />
       </button>
     </div>
   </div>
 );
+};

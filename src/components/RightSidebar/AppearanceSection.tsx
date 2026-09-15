@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * AppearanceSection Component
  *
@@ -35,8 +36,10 @@ export const AppearanceSection = ({
   onUpdateScreenshot,
   onOpenFontPicker,
   fontDisplayName,
-}: AppearanceSectionProps) => (
-  <SidebarSection title="Appearance">
+}: AppearanceSectionProps) => {
+  const { t } = useLanguage();
+  return (
+  <SidebarSection title={t("Appearance")}>
     <div className="space-y-4">
       {/* Background */}
       <BackgroundPicker
@@ -47,7 +50,7 @@ export const AppearanceSection = ({
 
       {/* Text Color */}
       <div>
-        <label className="block text-xs text-gray-400 mb-1">Text Color</label>
+        <label className="block text-xs text-gray-400 mb-1">{t("Text Color")}</label>
         <input
           type="color"
           value={screenshot.textColor}
@@ -58,7 +61,7 @@ export const AppearanceSection = ({
 
       {/* Font Style */}
       <div>
-        <label className="block text-xs text-gray-400 mb-1">Font Style</label>
+        <label className="block text-xs text-gray-400 mb-1">{t("Font Style")}</label>
         <button onClick={onOpenFontPicker} className={STYLES.dropdownButton}>
           <span className="truncate" style={{ fontFamily: `'${screenshot.fontFamily}', sans-serif` }}>
             {fontDisplayName ?? screenshot.fontFamily}
@@ -69,3 +72,4 @@ export const AppearanceSection = ({
     </div>
   </SidebarSection>
 );
+};

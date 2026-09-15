@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * DeviceSection Component
  *
@@ -50,8 +51,10 @@ export const DeviceSection = ({
   selectedDevice,
   onDeviceSelect,
   onColorSelect,
-}: DeviceSectionProps) => (
-  <SidebarSection title="Device">
+}: DeviceSectionProps) => {
+  const { t } = useLanguage();
+  return (
+  <SidebarSection title={t("Device")}>
     {/* Device list */}
     <div className={STYLES.buttonList}>
       {devices.map((device) => (
@@ -66,13 +69,13 @@ export const DeviceSection = ({
 
     {/* Color picker */}
     <div className="mt-3">
-      <p className="text-xs text-gray-400 mb-2">Color</p>
+      <p className="text-xs text-gray-400 mb-2">{t("Color")}</p>
       <div className={STYLES.colorPicker}>
         {selectedDevice.colors.map((color) => (
           <ColorButton
             key={color.id}
             color={color.frame}
-            label={color.label}
+            label={t(color.label)}
             isSelected={selectedColorId === color.id}
             onClick={() => onColorSelect(color.id)}
           />
@@ -81,3 +84,4 @@ export const DeviceSection = ({
     </div>
   </SidebarSection>
 );
+};

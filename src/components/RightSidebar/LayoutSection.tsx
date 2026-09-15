@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * LayoutSection Component
  *
@@ -28,6 +29,7 @@ export const LayoutSection = ({
   device,
   onUpdateDevice,
 }: LayoutSectionProps) => {
+  const { t } = useLanguage();
   const handleShadowUpdate = (updates: Partial<ShadowConfig>) => {
     onUpdateDevice({
       shadow: { ...device.shadow, ...updates },
@@ -37,20 +39,18 @@ export const LayoutSection = ({
   const is3D = device.style === "3d";
 
   return (
-    <SidebarSection title="Layout">
+    <SidebarSection title={t("Layout")}>
       <div className="space-y-3">
         {/* Device Style Toggle */}
         <div>
           <label className="block text-xs text-gray-400 mb-2">
-            Device Style
-          </label>
+            {t("Device Style")}</label>
           <div className="flex gap-1 p-0.5 bg-[#2a2a2a] rounded-lg">
             <button
               className={`${STYLES.modeButton} ${!is3D ? STYLES.modeButtonActive : STYLES.modeButtonInactive}`}
               onClick={() => onUpdateDevice({ style: "flat" })}
             >
-              Flat
-            </button>
+              {t("Flat")}</button>
             <button
               className={`${STYLES.modeButton} ${is3D ? STYLES.modeButtonActive : STYLES.modeButtonInactive}`}
               onClick={() => onUpdateDevice({ style: "3d" })}
@@ -61,7 +61,7 @@ export const LayoutSection = ({
         </div>
 
         <RangeSlider
-          label="Device Size"
+          label={t("Device Size")}
           value={device.scale}
           min={SLIDER_RANGES.deviceScale.min}
           max={SLIDER_RANGES.deviceScale.max}
@@ -70,7 +70,7 @@ export const LayoutSection = ({
         />
 
         <RangeSlider
-          label="Device Position"
+          label={t("Device Position")}
           value={device.y}
           min={SLIDER_RANGES.devicePosition.min}
           max={SLIDER_RANGES.devicePosition.max}
@@ -82,7 +82,7 @@ export const LayoutSection = ({
         {is3D ? (
           <>
             <RangeSlider
-              label="3D Rotate Y"
+              label={t("3D Rotate Y")}
               value={device.rotateY}
               min={SLIDER_RANGES.device3dRotateY.min}
               max={SLIDER_RANGES.device3dRotateY.max}
@@ -90,7 +90,7 @@ export const LayoutSection = ({
               onChange={(v) => onUpdateDevice({ rotateY: v })}
             />
             <RangeSlider
-              label="3D Rotate X"
+              label={t("3D Rotate X")}
               value={device.rotateX}
               min={SLIDER_RANGES.device3dRotateX.min}
               max={SLIDER_RANGES.device3dRotateX.max}
@@ -100,7 +100,7 @@ export const LayoutSection = ({
           </>
         ) : (
           <RangeSlider
-            label="Device Rotation"
+            label={t("Device Rotation")}
             value={device.rotation}
             min={SLIDER_RANGES.deviceRotation.min}
             max={SLIDER_RANGES.deviceRotation.max}

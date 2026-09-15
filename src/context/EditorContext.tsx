@@ -1,3 +1,4 @@
+import { useLanguage } from "./LanguageContext";
 import React, {
   createContext,
   useContext,
@@ -366,6 +367,7 @@ const getUniqueProjectName = (name: string, existingNames: Set<string>) => {
 };
 
 export const EditorProvider = ({ children }: { children: ReactNode }) => {
+  const { t } = useLanguage();
   // Project state
   const [projects, setProjects] = useState<Project[]>(getInitialProjects);
   const [activeProjectId, setActiveProjectId] = useState(() =>
@@ -908,11 +910,13 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const importWorkspaceBackup = async (file: File): Promise<number> => {
-    const raw = JSON.parse(await file.text()) as Partial<PersistedEditorState> & {
+    let raw: Partial<PersistedEditorState> & {
       format?: string;
     };
-    if (!Array.isArray(raw.projects)) {
-      throw new Error("This file is not an AppShots workspace backup.");
+    try { raw = JSON.parse(await file.text()) as typeof raw; }
+    catch { throw new Error(t("This file is not an AppShots workspace backup.")); }
+    if (!raw || !Array.isArray(raw.projects)) {
+      throw new Error(t("This file is not an AppShots workspace backup."));
     }
 
     const candidates = raw.projects.filter(
@@ -926,7 +930,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         ),
     );
     if (candidates.length === 0) {
-      throw new Error("The backup does not contain any usable projects.");
+      throw new Error(t("The backup does not contain any usable projects."));
     }
 
     const existingNames = new Set(projects.map((project) => project.name));
@@ -1598,7 +1602,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     setIsExporting(true);
     try {
       if (previewDimensions.width <= 0 || previewDimensions.height <= 0) {
-        throw new Error("Wait for the canvas to finish loading before exporting.");
+        throw new Error(t("Wait for the canvas to finish loading before exporting."));
       }
       const exportingScreens = screenshotId === undefined ? screenshots
         : screenshots.filter((screen) => screen.id === screenshotId);
@@ -1613,7 +1617,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         subheadlineFontSize,
       });
     } catch (error) {
-      window.alert(`Export failed: ${error instanceof Error ? error.message : String(error)}`);
+      window.alert(t("Export failed: {0}", [t(error instanceof Error ? error.message : String(error))]));
     } finally {
       exportInProgress.current = false;
       setIsExporting(false);

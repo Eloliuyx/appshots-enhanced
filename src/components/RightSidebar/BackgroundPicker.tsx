@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * BackgroundPicker Component
  *
@@ -27,9 +28,11 @@ export const BackgroundPicker = ({
   screenshot,
   gradientPresets,
   onUpdateScreenshot,
-}: BackgroundPickerProps) => (
+}: BackgroundPickerProps) => {
+  const { t } = useLanguage();
+  return (
   <div>
-    <label className="block text-xs text-gray-400 mb-1">Background</label>
+    <label className="block text-xs text-gray-400 mb-1">{t("Background")}</label>
     <div className="space-y-2">
       {/* Mode toggle */}
       <div className="flex gap-2">
@@ -41,8 +44,7 @@ export const BackgroundPicker = ({
               : STYLES.modeButtonInactive
           }`}
         >
-          Solid
-        </button>
+          {t("Solid")}</button>
         <button
           onClick={() => onUpdateScreenshot({ backgroundMode: "gradient" })}
           className={`${STYLES.modeButton} ${
@@ -51,8 +53,7 @@ export const BackgroundPicker = ({
               : STYLES.modeButtonInactive
           }`}
         >
-          Gradient
-        </button>
+          {t("Gradient")}</button>
       </div>
 
       {/* Color picker or gradient presets */}
@@ -86,3 +87,4 @@ export const BackgroundPicker = ({
     </div>
   </div>
 );
+};

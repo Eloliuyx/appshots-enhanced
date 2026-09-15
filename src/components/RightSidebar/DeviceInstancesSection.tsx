@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 import { ArrowUp, ArrowDown, Smartphone, X } from "lucide-react";
 import type { Screenshot } from "../../types";
 import { getDeviceSpecById } from "../../lib/device-instances";
@@ -20,21 +21,20 @@ export const DeviceInstancesSection = ({
   onRemoveDevice,
   onBringForward,
   onSendBackward,
-}: DeviceInstancesSectionProps) => (
-  <SidebarSection title="Devices">
+}: DeviceInstancesSectionProps) => {
+  const { t } = useLanguage();
+  return (
+  <SidebarSection title={t("Devices")}>
     <div className="space-y-2">
       <button onClick={onAddDevice} className={STYLES.uploadButton}>
-        + Add Device
-      </button>
+        {t("+ Add Device")}</button>
       <p className="text-[11px] leading-4 text-gray-500">
-        Add any number of device images, or keep this screenshot device-free.
-      </p>
+        {t("Add any number of device images, or keep this screenshot device-free.")}</p>
 
       <div className="space-y-2 mt-3">
         {screenshot.devices.length === 0 && (
           <div className="rounded-lg border border-dashed border-white/15 px-3 py-4 text-center text-xs leading-5 text-gray-500">
-            No devices on this screenshot.
-          </div>
+            {t("No devices on this screenshot.")}</div>
         )}
         {screenshot.devices.map((device, index) => {
           const spec = getDeviceSpecById(device.deviceId);
@@ -54,8 +54,7 @@ export const DeviceInstancesSection = ({
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-gray-300 truncate">{spec.label}</p>
                 <p className="text-[10px] text-gray-500">
-                  {device.screenshotSrc ? "Image attached" : "No image"} · Layer{" "}
-                  {index + 1} of {screenshot.devices.length}
+                  {device.screenshotSrc ? t("Image attached") : t("No image")} · {t("Layer {0} of {1}", [index + 1, screenshot.devices.length])}
                 </p>
               </div>
               <div className="flex items-center gap-1">
@@ -66,7 +65,7 @@ export const DeviceInstancesSection = ({
                   }}
                   disabled={index === 0}
                   className={STYLES.iconButton}
-                  title="Send backward"
+                  title={t("Send backward")}
                 >
                   <ArrowDown className="w-3.5 h-3.5" />
                 </button>
@@ -77,7 +76,7 @@ export const DeviceInstancesSection = ({
                   }}
                   disabled={index === screenshot.devices.length - 1}
                   className={STYLES.iconButton}
-                  title="Bring forward"
+                  title={t("Bring forward")}
                 >
                   <ArrowUp className="w-3.5 h-3.5" />
                 </button>
@@ -87,8 +86,8 @@ export const DeviceInstancesSection = ({
                     onRemoveDevice(device.id);
                   }}
                   className={STYLES.iconButtonDelete}
-                  title="Remove device"
-                  aria-label={`Remove ${spec.label}`}
+                  title={t("Remove device")}
+                  aria-label={t("Remove {0}", [spec.label])}
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -100,3 +99,4 @@ export const DeviceInstancesSection = ({
     </div>
   </SidebarSection>
 );
+};

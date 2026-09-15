@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * EditorToolbar Component
  *
@@ -63,6 +64,7 @@ export const EditorToolbar = ({
   onColorChange,
   onBackgroundColorChange,
 }: EditorToolbarProps) => {
+  const { t } = useLanguage();
   // Prevent toolbar clicks from stealing focus
   const preventFocus = (e: React.MouseEvent) => e.preventDefault();
 
@@ -72,7 +74,7 @@ export const EditorToolbar = ({
       <ToolbarButton
         onClick={() => onCommand("bold")}
         active={activeStyles.bold}
-        tooltip="Bold (Ctrl+B)"
+        tooltip={t("Bold (Ctrl+B)")}
         onMouseDown={preventFocus}
       >
         <Bold size={ICON_SIZE} />
@@ -80,7 +82,7 @@ export const EditorToolbar = ({
       <ToolbarButton
         onClick={() => onCommand("italic")}
         active={activeStyles.italic}
-        tooltip="Italic (Ctrl+I)"
+        tooltip={t("Italic (Ctrl+I)")}
         onMouseDown={preventFocus}
       >
         <Italic size={ICON_SIZE} />
@@ -88,7 +90,7 @@ export const EditorToolbar = ({
       <ToolbarButton
         onClick={() => onCommand("underline")}
         active={activeStyles.underline}
-        tooltip="Underline (Ctrl+U)"
+        tooltip={t("Underline (Ctrl+U)")}
         onMouseDown={preventFocus}
       >
         <Underline size={ICON_SIZE} />
@@ -101,14 +103,14 @@ export const EditorToolbar = ({
         value={textColor}
         onChange={onColorChange}
         onMouseDown={preventFocus}
-        tooltip="Text Color"
+        tooltip={t("Text Color")}
         icon={<Palette size={ICON_SIZE} />}
       />
       <ColorPicker
         value={backgroundColor}
         onChange={onBackgroundColorChange}
         onMouseDown={preventFocus}
-        tooltip="Text Background Color"
+        tooltip={t("Text Background Color")}
         icon={<Highlighter size={ICON_SIZE} />}
       />
 
@@ -118,7 +120,7 @@ export const EditorToolbar = ({
       <ToolbarButton
         onClick={() => onCommand("justifyLeft")}
         active={activeStyles.alignLeft}
-        tooltip="Align Left"
+        tooltip={t("Align Left")}
         onMouseDown={preventFocus}
       >
         <AlignLeft size={ICON_SIZE} />
@@ -126,7 +128,7 @@ export const EditorToolbar = ({
       <ToolbarButton
         onClick={() => onCommand("justifyCenter")}
         active={activeStyles.alignCenter}
-        tooltip="Align Center"
+        tooltip={t("Align Center")}
         onMouseDown={preventFocus}
       >
         <AlignCenter size={ICON_SIZE} />
@@ -134,7 +136,7 @@ export const EditorToolbar = ({
       <ToolbarButton
         onClick={() => onCommand("justifyRight")}
         active={activeStyles.alignRight}
-        tooltip="Align Right"
+        tooltip={t("Align Right")}
         onMouseDown={preventFocus}
       >
         <AlignRight size={ICON_SIZE} />
@@ -145,7 +147,7 @@ export const EditorToolbar = ({
       {/* AI Assist (placeholder) */}
       <ToolbarButton
         onClick={() => {}}
-        tooltip="AI Assist (Coming Soon)"
+        tooltip={t("AI Assist (Coming Soon)")}
         onMouseDown={preventFocus}
       >
         <Sparkles size={ICON_SIZE} />

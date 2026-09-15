@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 import { Plus, Trash2 } from "lucide-react";
 import type {
   Screenshot,
@@ -35,6 +36,7 @@ export const ContentSection = ({
   onHeadlineSizeChange,
   onSubheadlineSizeChange,
 }: ContentSectionProps) => {
+  const { t } = useLanguage();
   const typeTotals = screenshot.textLayers.reduce(
     (totals, layer) => ({
       ...totals,
@@ -45,7 +47,7 @@ export const ContentSection = ({
   const typeIndexes = { headline: 0, subheadline: 0 };
 
   return (
-    <SidebarSection title="Text Layers">
+    <SidebarSection title={t("Text Layers")}>
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-2">
           <button
@@ -54,21 +56,19 @@ export const ContentSection = ({
             className="flex items-center justify-center gap-1.5 rounded-md bg-white px-2 py-2 text-xs font-medium text-black transition-colors hover:bg-neutral-200"
           >
             <Plus className="h-3.5 w-3.5" />
-            Headline
-          </button>
+            {t("Headline")}</button>
           <button
             type="button"
             onClick={() => onAddTextLayer("subheadline")}
             className="flex items-center justify-center gap-1.5 rounded-md bg-[#2a2a2a] px-2 py-2 text-xs font-medium text-gray-200 transition-colors hover:bg-[#333]"
           >
             <Plus className="h-3.5 w-3.5" />
-            Subheadline
-          </button>
+            {t("Subheadline")}</button>
         </div>
 
         <div className="grid grid-cols-2 gap-3 rounded-lg border border-white/10 bg-[#262626] p-2.5">
           <RangeSlider
-            label="Headline Size"
+            label={t("Headline Size")}
             value={headlineFontSize}
             min={SLIDER_RANGES.headlineSize.min}
             max={SLIDER_RANGES.headlineSize.max}
@@ -76,7 +76,7 @@ export const ContentSection = ({
             onChange={onHeadlineSizeChange}
           />
           <RangeSlider
-            label="Subheadline Size"
+            label={t("Subheadline Size")}
             value={subheadlineFontSize}
             min={SLIDER_RANGES.subheadlineSize.min}
             max={SLIDER_RANGES.subheadlineSize.max}
@@ -87,8 +87,7 @@ export const ContentSection = ({
 
         {screenshot.textLayers.length === 0 && (
           <div className="rounded-lg border border-dashed border-white/15 px-3 py-4 text-center text-xs leading-5 text-gray-500">
-            No text layers. Add a headline or subheadline when you need one.
-          </div>
+            {t("No text layers. Add a headline or subheadline when you need one.")}</div>
         )}
 
         {screenshot.textLayers.map((layer) => {
@@ -111,7 +110,7 @@ export const ContentSection = ({
             >
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-xs font-medium text-gray-300">
-                  {layer.type === "headline" ? "Headline" : "Subheadline"}
+                  {layer.type === "headline" ? t("Headline") : t("Subheadline")}
                   {typeTotals[layer.type] > 1 ? ` ${position}` : ""}
                 </span>
                 <button
@@ -121,8 +120,8 @@ export const ContentSection = ({
                     onRemoveTextLayer(layer.id);
                   }}
                   className="rounded p-1 text-gray-500 transition-colors hover:bg-white/10 hover:text-red-400"
-                  aria-label={`Remove ${layer.type} ${position}`}
-                  title="Remove text layer"
+                  aria-label={t("Remove {0} {1}", [t(layer.type === "headline" ? "Headline" : "Subheadline"), position])}
+                  title={t("Remove text layer")}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
@@ -132,11 +131,11 @@ export const ContentSection = ({
                 onChange={(content) =>
                   onUpdateTextLayer(layer.id, { content })
                 }
-                placeholder={`Enter ${layer.type}...`}
+                placeholder={t("Enter {0}...", [t(layer.type === "headline" ? "Headline" : "Subheadline")])}
               />
               <div className="mt-2">
                 <RangeSlider
-                  label="Width"
+                  label={t("Width")}
                   value={layer.width}
                   min={SLIDER_RANGES.textWidth.min}
                   max={SLIDER_RANGES.textWidth.max}

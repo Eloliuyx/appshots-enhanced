@@ -7,6 +7,7 @@
 import type { FontConfig } from "../../lib/google-fonts";
 import { PREVIEW_TEXT } from "./constants";
 import { getFontFamily } from "./utils";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface FontCardProps {
   /** Font data */
@@ -35,7 +36,9 @@ interface FontCardProps {
  *   onSelect={() => handleSelect("Roboto")}
  * />
  */
-export const FontCard = ({ font, isSelected, onSelect }: FontCardProps) => (
+export const FontCard = ({ font, isSelected, onSelect }: FontCardProps) => {
+  const { t } = useLanguage();
+  return (
   <button
     onClick={onSelect}
     className={`group flex flex-col p-4 rounded-lg border text-left transition-all hover:border-white hover:bg-[#2a2a2a] ${
@@ -50,7 +53,7 @@ export const FontCard = ({ font, isSelected, onSelect }: FontCardProps) => (
         {font.family}
       </span>
       <span className="text-xs text-gray-500 font-mono border border-white/10 px-2 py-0.5 rounded-full">
-        {font.category}
+        {t(font.category)}
       </span>
     </div>
 
@@ -59,7 +62,8 @@ export const FontCard = ({ font, isSelected, onSelect }: FontCardProps) => (
       className="text-2xl text-gray-400 group-hover:text-white truncate w-full"
       style={{ fontFamily: getFontFamily(font.family, font.category) }}
     >
-      {PREVIEW_TEXT}
+      {t(PREVIEW_TEXT)}
     </p>
   </button>
-);
+  );
+};

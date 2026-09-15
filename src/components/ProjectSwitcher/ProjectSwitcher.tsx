@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * ProjectSwitcher Component
  *
@@ -51,6 +52,7 @@ const ProjectItem = ({
   canCopyInto,
   sourceProjectName,
 }: ProjectItemProps) => {
+  const { t } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(project.name);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -132,13 +134,13 @@ const ProjectItem = ({
             onClick={(e) => {
               e.stopPropagation();
               const shouldCopy = window.confirm(
-                `Replace “${project.name}” with a copy of “${sourceProjectName}”?`,
+                t("Replace “{0}” with a copy of “{1}”?", [project.name, sourceProjectName]),
               );
               if (shouldCopy) onCopyInto();
             }}
             className="p-1 hover:bg-zinc-700 rounded text-zinc-400 hover:text-violet-300"
-            title={`Copy ${sourceProjectName} into ${project.name}`}
-            aria-label={`Copy ${sourceProjectName} into ${project.name}`}
+            title={t("Copy {0} into {1}", [sourceProjectName, project.name])}
+            aria-label={t("Copy {0} into {1}", [sourceProjectName, project.name])}
           >
             <Copy className="w-3.5 h-3.5" />
           </button>
@@ -149,7 +151,7 @@ const ProjectItem = ({
             setIsEditing(true);
           }}
           className="p-1 hover:bg-zinc-700 rounded text-zinc-400 hover:text-white"
-          title="Rename project"
+          title={t("Rename project")}
         >
           <Pencil className="w-3.5 h-3.5" />
         </button>
@@ -160,7 +162,7 @@ const ProjectItem = ({
               onDelete();
             }}
             className="p-1 hover:bg-zinc-700 rounded text-zinc-400 hover:text-red-400"
-            title="Delete project"
+            title={t("Delete project")}
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -174,6 +176,7 @@ const ProjectItem = ({
  * ProjectSwitcher - Main dropdown component
  */
 export const ProjectSwitcher = () => {
+  const { t } = useLanguage();
   const {
     projects,
     activeProjectId,
@@ -246,11 +249,11 @@ export const ProjectSwitcher = () => {
       const count = await importWorkspaceBackup(file);
       setIsOpen(false);
       window.alert(
-        `Imported ${count} project${count === 1 ? "" : "s"}. Your existing projects were kept.`,
+        t(count === 1 ? "Imported {0} project. Your existing projects were kept." : "Imported {0} projects. Your existing projects were kept.", [count]),
       );
     } catch (error) {
       window.alert(
-        error instanceof Error ? error.message : "Could not import this backup.",
+        error instanceof Error ? t(error.message) : t("Could not import this backup."),
       );
     }
   };
@@ -279,8 +282,7 @@ export const ProjectSwitcher = () => {
           {/* Header */}
           <div className="px-3 py-2 border-b border-zinc-800">
             <span className="text-xs font-medium text-zinc-500 uppercase tracking-wide">
-              Projects
-            </span>
+              {t("Projects")}</span>
           </div>
 
           {/* Project list */}
@@ -314,7 +316,7 @@ export const ProjectSwitcher = () => {
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Project name"
+                  placeholder={t("Project name")}
                   className="flex-1 px-2 py-1.5 text-sm bg-zinc-800 border border-zinc-600 rounded text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500"
                 />
                 <button
@@ -340,8 +342,7 @@ export const ProjectSwitcher = () => {
                 className="w-full flex items-center gap-2 px-3 py-2 text-sm text-violet-400 hover:bg-zinc-800 transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                New Project
-              </button>
+                {t("New Project")}</button>
             )}
           </div>
 
@@ -350,11 +351,10 @@ export const ProjectSwitcher = () => {
               type="button"
               onClick={exportWorkspaceBackup}
               className="flex items-center justify-center gap-1.5 border-r border-zinc-800 px-2 py-2 text-xs text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white"
-              title="Download every project as an editable backup"
+              title={t("Download every project as an editable backup")}
             >
               <Download className="h-3.5 w-3.5" />
-              Backup
-            </button>
+              {t("Backup")}</button>
             <input
               ref={backupInputRef}
               type="file"
@@ -366,11 +366,10 @@ export const ProjectSwitcher = () => {
               type="button"
               onClick={() => backupInputRef.current?.click()}
               className="flex items-center justify-center gap-1.5 px-2 py-2 text-xs text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white"
-              title="Import an editable AppShots backup without replacing current projects"
+              title={t("Import an editable AppShots backup without replacing current projects")}
             >
               <Upload className="h-3.5 w-3.5" />
-              Import Backup
-            </button>
+              {t("Import Backup")}</button>
           </div>
         </div>
       )}

@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * OverlayImagesSection Component
  *
@@ -60,6 +61,7 @@ export const OverlayImagesSection = ({
   onBringForward,
   onSendBackward,
 }: OverlayImagesSectionProps) => {
+  const { t } = useLanguage();
   const selectedImage =
     selectedElement?.type === "image" &&
     selectedElement.screenshotId === screenshot.id &&
@@ -74,7 +76,7 @@ export const OverlayImagesSection = ({
   };
 
   return (
-    <SidebarSection title="Overlay Images">
+    <SidebarSection title={t("Overlay Images")}>
       <div className="space-y-2">
         <input
           ref={overlayImageInputRef}
@@ -87,8 +89,7 @@ export const OverlayImagesSection = ({
           onClick={() => overlayImageInputRef.current?.click()}
           className={STYLES.uploadButton}
         >
-          + Add Image
-        </button>
+          {t("+ Add Image")}</button>
 
         {screenshot.overlayImages.length > 0 && (
           <div className="space-y-2 mt-3">

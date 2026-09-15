@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * FontPickerHeader Component
  *
@@ -21,15 +22,18 @@ interface FontPickerHeaderProps {
  * @example
  * <FontPickerHeader onClose={() => setIsOpen(false)} />
  */
-export const FontPickerHeader = ({ onClose }: FontPickerHeaderProps) => (
+export const FontPickerHeader = ({ onClose }: FontPickerHeaderProps) => {
+  const { t } = useLanguage();
+  return (
   <div className="flex items-center justify-between p-4 border-b border-white/10">
-    <h2 className="text-lg font-semibold text-white">Select a Font</h2>
+    <h2 className="text-lg font-semibold text-white">{t("Select a Font")}</h2>
     <button
       onClick={onClose}
       className={STYLES.iconButton}
-      aria-label="Close font picker"
+      aria-label={t("Close font picker")}
     >
       <X size={20} />
     </button>
   </div>
 );
+};

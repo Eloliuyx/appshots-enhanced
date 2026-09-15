@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * SearchInput Component
  *
@@ -29,7 +30,9 @@ interface SearchInputProps {
  *   onChange={setSearchQuery}
  * />
  */
-export const SearchInput = ({ value, onChange }: SearchInputProps) => (
+export const SearchInput = ({ value, onChange }: SearchInputProps) => {
+  const { t } = useLanguage();
+  return (
   <div className="p-4 border-b border-white/10 bg-[#1e1e1e]">
     <div className="relative">
       <Search
@@ -38,7 +41,7 @@ export const SearchInput = ({ value, onChange }: SearchInputProps) => (
       />
       <input
         type="text"
-        placeholder="Search from all Google Fonts..."
+        placeholder={t("Search from all Google Fonts...")}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={STYLES.input}
@@ -47,3 +50,4 @@ export const SearchInput = ({ value, onChange }: SearchInputProps) => (
     </div>
   </div>
 );
+};

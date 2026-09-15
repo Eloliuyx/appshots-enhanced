@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * OverlayImageProperties Component
  *
@@ -25,10 +26,12 @@ export const OverlayImageProperties = ({
   onShadowColorChange,
   onShadowBlurChange,
   onShadowOffsetYChange,
-}: OverlayImagePropertiesProps) => (
+}: OverlayImagePropertiesProps) => {
+  const { t } = useLanguage();
+  return (
   <div className={STYLES.propertiesPanel}>
     <RangeSlider
-      label="Size"
+      label={t("Size")}
       value={image.width}
       min={SLIDER_RANGES.imageSize.min}
       max={SLIDER_RANGES.imageSize.max}
@@ -37,7 +40,7 @@ export const OverlayImageProperties = ({
     />
 
     <RangeSlider
-      label="Rotation"
+      label={t("Rotation")}
       value={image.rotation ?? 0}
       min={SLIDER_RANGES.imageRotation.min}
       max={SLIDER_RANGES.imageRotation.max}
@@ -46,7 +49,7 @@ export const OverlayImageProperties = ({
     />
 
     <div>
-      <label className="block text-xs text-gray-400 mb-1">Layer Position</label>
+      <label className="block text-xs text-gray-400 mb-1">{t("Layer Position")}</label>
       <div className="flex gap-1">
         <button
           onClick={() => onLayerChange("behind")}
@@ -56,8 +59,7 @@ export const OverlayImageProperties = ({
               : "bg-[#333] text-gray-300 hover:bg-[#444]"
           }`}
         >
-          Behind Device
-        </button>
+          {t("Behind Device")}</button>
         <button
           onClick={() => onLayerChange("front")}
           className={`${STYLES.modeButton} transition-colors ${
@@ -66,8 +68,7 @@ export const OverlayImageProperties = ({
               : "bg-[#333] text-gray-300 hover:bg-[#444]"
           }`}
         >
-          In Front
-        </button>
+          {t("In Front")}</button>
       </div>
     </div>
 
@@ -80,3 +81,4 @@ export const OverlayImageProperties = ({
     />
   </div>
 );
+};

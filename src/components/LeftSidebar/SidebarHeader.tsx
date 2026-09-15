@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * SidebarHeader Component
  *
@@ -15,11 +16,13 @@ import { STYLES } from "./constants";
  * @example
  * <SidebarHeader />
  */
-export const SidebarHeader = () => (
+export const SidebarHeader = () => {
+  const { t } = useLanguage();
+  return (
   <div className={STYLES.header}>
-    <h1 className="text-lg font-semibold">AppShots Editor</h1>
+    <h1 className="text-lg font-semibold">{t("AppShots Editor")}</h1>
     <p className="text-xs text-gray-400 mt-1">
-      Create App Store and Google Play screenshots
-    </p>
+      {t("Create App Store and Google Play screenshots")}</p>
   </div>
 );
+};

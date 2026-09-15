@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * ExportSection Component
  *
@@ -51,14 +52,16 @@ export const ExportSection = ({
   onExportCurrent,
   currentScreenshotNumber,
   isExporting,
-}: ExportSectionProps) => (
-  <SidebarSection title="Export">
+}: ExportSectionProps) => {
+  const { t } = useLanguage();
+  return (
+  <SidebarSection title={t("Export")}>
     {/* Size options */}
     <div className={STYLES.buttonList}>
       {exportSizes.map((size) => (
         <SelectionButton
           key={size.id}
-          label={size.label}
+          label={t(size.label)}
           isSelected={selectedSizeId === size.id}
           onClick={() => onSizeSelect(size.id)}
         />
@@ -71,11 +74,12 @@ export const ExportSection = ({
       disabled={isExporting || currentScreenshotNumber < 1}
       className={`${STYLES.primaryButton} disabled:opacity-40 disabled:cursor-not-allowed`}
     >
-      {isExporting ? "Exporting…" : `Export Current (#${currentScreenshotNumber})`}
+      {isExporting ? t("Exporting…") : t("Export Current (#{0})", [currentScreenshotNumber])}
     </button>
-    <p className="mt-2 text-xs text-zinc-400">Select a screenshot on the canvas to export it as a PNG.</p>
+    <p className="mt-2 text-xs text-zinc-400">{t("Select a screenshot on the canvas to export it as a PNG.")}</p>
     <button onClick={onExport} disabled={isExporting} className={`${STYLES.primaryButton} disabled:opacity-40 disabled:cursor-not-allowed`}>
-      Export All ({screenshotCount})
+      {t("Export All ({0})", [screenshotCount])}
     </button>
   </SidebarSection>
 );
+};

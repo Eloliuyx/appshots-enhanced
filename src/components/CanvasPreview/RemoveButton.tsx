@@ -5,6 +5,7 @@
  */
 
 import { X } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface RemoveButtonProps {
   /** Handler for remove action */
@@ -23,8 +24,12 @@ interface RemoveButtonProps {
  * @example
  * {canRemove && <RemoveButton onRemove={() => removeScreenshot(id)} />}
  */
-export const RemoveButton = ({ onRemove }: RemoveButtonProps) => (
+export const RemoveButton = ({ onRemove }: RemoveButtonProps) => {
+  const { t } = useLanguage();
+  return (
   <button
+    aria-label={t("Remove screenshot")}
+    title={t("Remove screenshot")}
     data-editor-control="true"
     onClick={(e) => {
       e.stopPropagation();
@@ -34,4 +39,5 @@ export const RemoveButton = ({ onRemove }: RemoveButtonProps) => (
   >
     <X className="w-3 h-3" />
   </button>
-);
+  );
+};

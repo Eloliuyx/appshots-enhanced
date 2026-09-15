@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * FontPickerFooter Component
  *
@@ -20,10 +21,12 @@ interface FontPickerFooterProps {
  * @example
  * <FontPickerFooter onCancel={() => setIsOpen(false)} />
  */
-export const FontPickerFooter = ({ onCancel }: FontPickerFooterProps) => (
+export const FontPickerFooter = ({ onCancel }: FontPickerFooterProps) => {
+  const { t } = useLanguage();
+  return (
   <div className="p-4 border-t border-white/10 flex justify-end bg-[#1e1e1e] rounded-b-xl">
     <button onClick={onCancel} className={STYLES.cancelButton}>
-      Cancel
-    </button>
+      {t("Cancel")}</button>
   </div>
 );
+};

@@ -1,3 +1,4 @@
+import { useLanguage } from "../../context/LanguageContext";
 /**
  * EmptyState Component
  *
@@ -27,14 +28,16 @@ interface EmptyStateProps {
  *   onClearSearch={() => setSearchQuery("")}
  * />
  */
-export const EmptyState = ({ searchQuery, onClearSearch }: EmptyStateProps) => (
+export const EmptyState = ({ searchQuery, onClearSearch }: EmptyStateProps) => {
+  const { t } = useLanguage();
+  return (
   <div className="col-span-full py-12 text-center text-gray-500 flex flex-col items-center gap-2">
-    <p>No fonts found matching "{searchQuery}"</p>
+    <p>{t("No fonts found matching “{0}”", [searchQuery])}</p>
     <button
       onClick={onClearSearch}
       className="text-neutral-400 hover:text-neutral-300 text-sm"
     >
-      Clear search
-    </button>
+      {t("Clear search")}</button>
   </div>
 );
+};

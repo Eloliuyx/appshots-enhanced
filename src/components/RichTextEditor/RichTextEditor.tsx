@@ -16,6 +16,7 @@ import { STYLES } from "./constants";
 import { useRichTextEditor } from "./useRichTextEditor";
 import { EditorToolbar } from "./EditorToolbar";
 import { EditorContent } from "./EditorContent";
+import { useLanguage } from "../../context/LanguageContext";
 
 /**
  * RichTextEditor - Lightweight WYSIWYG editor
@@ -44,6 +45,7 @@ export const RichTextEditor = ({
   placeholder = "Type something...",
   className = "",
 }: RichTextEditorProps) => {
+  const { t } = useLanguage();
   const {
     editorRef,
     textColor,
@@ -69,7 +71,7 @@ export const RichTextEditor = ({
       />
       <EditorContent
         editorRef={editorRef}
-        placeholder={placeholder}
+        placeholder={t(placeholder)}
         isEmpty={isEmpty}
         onInput={handleInput}
         onBlur={triggerChange}
