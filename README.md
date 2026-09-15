@@ -79,7 +79,7 @@ A free, open-source tool to create stunning, high-converting screenshots for the
 - **Full 3D support** — 3D perspective, edges, and shadows are preserved in exports
 - **Cross-screen layouts preserved** — multi-device overflow compositions export exactly like the on-canvas preview
 - **Pixel-perfect** — exported images match the on-screen preview
-- **Post-export GitHub prompt** — after export, show a quick modal with a direct link to star the project on GitHub
+- **Uninterrupted exports** — no post-export star popup or promotional banner in this fork; original MIT attribution remains in LICENSE
 
 ### 🖥️ Editor Experience
 
@@ -90,6 +90,11 @@ A free, open-source tool to create stunning, high-converting screenshots for the
 - **Drag-and-drop** — reposition any element by dragging directly on the canvas
 - **Device manager** — add, select, remove, and reorder devices from the right sidebar
 - **Element selection** — click to select text, devices, or overlay images with visual feedback
+- **Explicit screenshot navigation** — numbered buttons above the canvas switch screenshots regardless of overlapping artwork
+- **Unified Layers panel** — select any text, device, or image without moving covering objects out of the way
+- **Move Selected mode** — after choosing a layer in Layers, drag anywhere in the active screenshot to move only that object. Turn the mode off to pick objects normally. X/Y percentage inputs offer exact placement without dragging.
+- **Contained image hit areas** — object-contain letterbox margins don't intercept clicks; PNG-internal transparent pixels may still have a rectangular hit area, so use Layers for overlapping transparent artwork
+- **Isolated canvas stacking** — font picker is portaled above artwork; screenshot management controls stay above all canvas objects
 - **Helpful rich-text tooltips** — formatting controls include hover/focus tooltips
 - **Dark mode UI** — sleek dark interface that's easy on the eyes
 

@@ -5,8 +5,9 @@
  */
 
 import type { ImageOverlay } from "../../types";
+import { useLayoutEffect, useRef, useState } from "react";
 import { SelectionHandles } from "./SelectionHandles";
-import { getOverlayImageStyles, getDropShadowFilter } from "./utils";
+import { getOverlayImageStyles, getDropShadowFilter, getContainedImagePercent, getImageSelectionStyles } from "./utils";
 
 interface OverlayImageProps {
   /** Overlay image data */
@@ -49,20 +50,48 @@ export const OverlayImage = ({
   isSelected,
   isInteractive,
   onMouseDown,
-}: OverlayImageProps) => (
+}: OverlayImageProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const [box, setBox] = useState({ width: 0, height: 0 });
+  const [natural, setNatural] = useState({ width: 0, height: 0 });
+  const readNaturalSize = () => {
+    if (imageRef.current) setNatural({ width: imageRef.current.naturalWidth, height: imageRef.current.naturalHeight });
+  };
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    setBox({ width: container.clientWidth, height: container.clientHeight });
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) setBox({ width: entry.contentRect.width, height: entry.contentRect.height });
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+  useLayoutEffect(() => { readNaturalSize(); }, [image.src]);
+  const fit = getContainedImagePercent(box.width, box.height, natural.width, natural.height);
+  return (
   <div
-    data-draggable-element="image"
-    className="absolute cursor-move select-none"
-    style={getOverlayImageStyles(image, zIndex, isSelected)}
-    onMouseDown={isInteractive ? onMouseDown : undefined}
-    onClick={(e) => e.stopPropagation()}
+    ref={containerRef}
+    className="absolute select-none"
+    style={{ ...getOverlayImageStyles(image, zIndex, false), pointerEvents: "none" }}
   >
+    <div data-draggable-element="image" className="absolute cursor-move"
+      style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)",
+        width: `${fit.width}%`, height: `${fit.height}%`,
+        pointerEvents: isInteractive ? "auto" : "none", ...getImageSelectionStyles(isSelected) }}
+      onMouseDown={isInteractive ? onMouseDown : undefined}
+      onClick={(event) => { if (isInteractive) event.stopPropagation(); }}>
     <img
+      ref={imageRef}
+      onLoad={readNaturalSize}
       src={image.src}
       alt="Overlay"
       className="w-full h-full object-contain pointer-events-none"
       style={{ filter: getDropShadowFilter(image.shadow) }}
     />
     {isSelected && <SelectionHandles />}
+    </div>
   </div>
-);
+  );
+};

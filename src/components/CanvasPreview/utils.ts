@@ -7,6 +7,15 @@
 import type { ImageOverlay, SelectedElement, ShadowConfig } from "../../types";
 import { SELECTION_COLORS } from "./constants";
 
+/** object-contain's visible rectangle, excluding invisible letterbox margins. */
+export const getContainedImagePercent = (width: number, height: number, naturalWidth: number, naturalHeight: number) => {
+  if ([width, height, naturalWidth, naturalHeight].some((value) => value <= 0)) return { width: 100, height: 100 };
+  const ratio = naturalWidth / naturalHeight;
+  return ratio > width / height
+    ? { width: 100, height: (width / ratio / height) * 100 }
+    : { width: (height * ratio / width) * 100, height: 100 };
+};
+
 /**
  * Generates drop shadow CSS filter from shadow configuration.
  *

@@ -105,8 +105,8 @@ interface EditorContextType {
   // State
   isFontPickerOpen: boolean;
   setIsFontPickerOpen: (open: boolean) => void;
-  isStarModalOpen: boolean;
-  setIsStarModalOpen: (open: boolean) => void;
+  moveSelectedMode: boolean;
+  setMoveSelectedMode: (enabled: boolean) => void;
   selectedDeviceId: string;
   setSelectedDeviceId: (id: string) => void;
   selectedColorId: string;
@@ -378,7 +378,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
   // Initialize state from persisted values or defaults
   const [isFontPickerOpen, setIsFontPickerOpen] = useState(false);
-  const [isStarModalOpen, setIsStarModalOpen] = useState(false);
+  const [moveSelectedMode, setMoveSelectedMode] = useState(false);
   const [selectedDeviceId, setSelectedDeviceIdState] = useState(
     activeProject.selectedDeviceId,
   );
@@ -456,6 +456,11 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const [selectedElement, setSelectedElement] = useState<SelectedElement | null>(
     null,
   );
+  useEffect(() => {
+    if (!selectedElement || selectedElement.screenshotId !== activeScreenshotId) {
+      setMoveSelectedMode(false);
+    }
+  }, [selectedElement, activeScreenshotId]);
 
   const [isDragging, setIsDragging] = useState(false);
   const dragStartPos = useRef({ x: 0, y: 0 });
@@ -1607,7 +1612,6 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         headlineFontSize,
         subheadlineFontSize,
       });
-      setIsStarModalOpen(true);
     } catch (error) {
       window.alert(`Export failed: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
@@ -1632,7 +1636,6 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     setHeadlineFontSizeState(defaultProject.headlineFontSize);
     setSubheadlineFontSizeState(defaultProject.subheadlineFontSize);
     setSelectedElement(null);
-    setIsStarModalOpen(false);
     isApplyingHistoryRef.current = true;
     resetHistory({
       screenshots: defaultProject.screenshots,
@@ -1662,8 +1665,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
         isFontPickerOpen,
         setIsFontPickerOpen,
-        isStarModalOpen,
-        setIsStarModalOpen,
+        moveSelectedMode,
+        setMoveSelectedMode,
         selectedDeviceId,
         setSelectedDeviceId,
         selectedColorId,

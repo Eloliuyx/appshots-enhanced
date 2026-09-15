@@ -21,6 +21,7 @@ import { ContentSection } from "./ContentSection";
 import { AppearanceSection } from "./AppearanceSection";
 import { OverlayImagesSection } from "./OverlayImagesSection";
 import { STYLES } from "./constants";
+import { LayersSection } from "./LayersSection";
 
 /**
  * RightSidebar - Main properties sidebar
@@ -67,6 +68,7 @@ export const RightSidebar = () => {
   return (
     <aside className={STYLES.sidebar}>
       <div className={STYLES.content}>
+        <LayersSection />
         <DeviceInstancesSection
           screenshot={activeScreenshot}
           onAddDevice={addDevice}

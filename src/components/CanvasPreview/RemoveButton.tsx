@@ -25,11 +25,12 @@ interface RemoveButtonProps {
  */
 export const RemoveButton = ({ onRemove }: RemoveButtonProps) => (
   <button
+    data-editor-control="true"
     onClick={(e) => {
       e.stopPropagation();
       onRemove();
     }}
-    className="absolute top-2 right-2 w-6 h-6 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white z-10"
+    className="absolute top-2 right-2 w-6 h-6 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white z-[1000]"
   >
     <X className="w-3 h-3" />
   </button>

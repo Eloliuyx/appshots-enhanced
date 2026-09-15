@@ -15,7 +15,7 @@ export const PREVIEW_TEXT = "The quick brown fox jumps over the lazy dog";
 export const STYLES = {
   /** Modal backdrop */
   backdrop:
-    "fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200",
+    "fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200",
 
   /** Modal container */
   modal:

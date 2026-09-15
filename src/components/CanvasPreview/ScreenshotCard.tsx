@@ -57,6 +57,7 @@ interface ScreenshotCardProps {
   onMoveLeft: () => void;
   onMoveRight: () => void;
   onOrderPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => void;
+  moveSelectedMode?: boolean;
 }
 
 /**
@@ -89,6 +90,7 @@ export const ScreenshotCard = ({
   onMoveLeft,
   onMoveRight,
   onOrderPointerDown,
+  moveSelectedMode = false,
 }: ScreenshotCardProps) => {
   // Split overlay images by layer
   const behindImages = screenshot.overlayImages.filter(
@@ -110,6 +112,24 @@ export const ScreenshotCard = ({
     <div
       ref={isActive ? previewRef : undefined}
       data-screenshot-card="true"
+      onClickCapture={(event) => {
+        if (!isActive && !(event.target as HTMLElement).closest("[data-editor-control]")) {
+          onSelect();
+          event.stopPropagation();
+        }
+      }}
+      onMouseDownCapture={(event) => {
+        if (event.button !== 0) return;
+        if ((event.target as HTMLElement).closest("[data-editor-control]")) return;
+        if (!isActive) {
+          onSelect();
+          event.stopPropagation();
+          return;
+        }
+        if (moveSelectedMode && selectedElement?.screenshotId === screenshot.id) {
+          onElementMouseDown(event, selectedElement.type, screenshot.id, selectedElement.id);
+        }
+      }}
       onClick={onSelect}
       onMouseUp={onElementMouseUp}
       onMouseDown={handleBackgroundMouseDown}
@@ -117,6 +137,7 @@ export const ScreenshotCard = ({
         isActive ? "opacity-100" : "opacity-70 hover:opacity-100"
       }`}
       style={{
+        isolation: "isolate",
         background: getBackgroundStyle(screenshot),
         aspectRatio: `${exportSize.width}/${exportSize.height}`,
         boxShadow: isActive
@@ -137,7 +158,7 @@ export const ScreenshotCard = ({
       />
 
       {/* Content layer */}
-      <div className="absolute inset-0 select-none">
+      <div className="absolute inset-0 select-none" style={{ pointerEvents: isActive ? undefined : "none" }}>
         {/* Overlay images behind device */}
         {behindImages.map((image, index) => (
           <OverlayImage
@@ -207,7 +228,7 @@ export const ScreenshotCard = ({
               ownerScreenshotId,
               device.id,
             )}
-            isInteractive
+            isInteractive={isActive && ownerScreenshotId === screenshot.id}
             onMouseDown={(e) =>
               onElementMouseDown(e, "device", ownerScreenshotId, device.id)
             }

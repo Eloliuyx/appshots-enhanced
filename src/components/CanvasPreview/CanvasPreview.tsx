@@ -52,12 +52,18 @@ export const CanvasPreview = () => {
     undo,
     redo,
     importFinishedScreenshots,
+    moveSelectedMode,
   } = useEditor();
   const [draggedScreenshotId, setDraggedScreenshotId] = useState<string | null>(
     null,
   );
   const [dragTargetId, setDragTargetId] = useState<string | null>(null);
   const dragTargetIdRef = useRef<string | null>(null);
+  const cardRefs = useRef(new Map<string, HTMLDivElement>());
+
+  useEffect(() => {
+    cardRefs.current.get(activeScreenshotId)?.scrollIntoView?.({ block: "nearest", inline: "center", behavior: "smooth" });
+  }, [activeScreenshotId]);
 
   useEffect(() => {
     if (!draggedScreenshotId) return;
@@ -121,6 +127,18 @@ export const CanvasPreview = () => {
         onImportFinishedScreenshots={importFinishedScreenshots}
       />
 
+      <nav aria-label="Select screenshot" className="flex shrink-0 gap-2 overflow-x-auto border-b border-white/10 bg-[#141414] px-4 py-2">
+        {screenshots.map((screenshot, index) => (
+          <button key={screenshot.id} type="button"
+            aria-label={`Select screenshot ${index + 1}`}
+            aria-pressed={activeScreenshotId === screenshot.id}
+            onClick={() => { setActiveScreenshotId(screenshot.id); setSelectedElement(null); }}
+            className={`shrink-0 rounded-md border px-3 py-1 text-xs ${activeScreenshotId === screenshot.id ? "border-white bg-white text-black" : "border-white/15 text-zinc-300 hover:bg-white/10"}`}>
+            Screenshot {index + 1}
+          </button>
+        ))}
+      </nav>
+
       {/* Preview area with horizontal scroll */}
       <div
         ref={canvasContainerRef}
@@ -136,6 +154,7 @@ export const CanvasPreview = () => {
             return (
               <div
                 key={screenshot.id}
+                ref={(element) => { if (element) cardRefs.current.set(screenshot.id, element); else cardRefs.current.delete(screenshot.id); }}
                 data-screenshot-drop-id={screenshot.id}
                 className={`relative h-full rounded-xl transition-all ${
                   dragTargetId === screenshot.id &&
@@ -147,6 +166,7 @@ export const CanvasPreview = () => {
                 }`}
               >
                 <ScreenshotCard
+                  moveSelectedMode={moveSelectedMode}
                   screenshot={screenshot}
                   renderableDevices={renderableDevices}
                   isActive={activeScreenshotId === screenshot.id}

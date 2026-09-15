@@ -7,6 +7,16 @@ afterEach(cleanup);
 const font = { family: `AppShotsFont-${"b".repeat(64)}`, name: "My Font.ttf", dataUrl: "data:font/ttf;base64,AAEAAA==" };
 
 describe("custom font picker", () => {
+  it("renders as a top-level dialog rather than inside the canvas stack", () => {
+    const onClose = vi.fn();
+    const { container } = render(<FontPicker isOpen onClose={onClose} selectedFontFamily="Inter" onSelect={vi.fn()} customFonts={[]} onUpload={vi.fn()} />);
+    const dialog = screen.getByRole("dialog", { name: "Select a Font" });
+    expect(container.contains(dialog)).toBe(false);
+    expect(dialog.parentElement?.parentElement).toBe(document.body);
+    expect(dialog.getAttribute("aria-modal")).toBe("true");
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledOnce();
+  });
   it("can select a saved custom font", () => {
     const onSelect = vi.fn();
     const onClose = vi.fn();

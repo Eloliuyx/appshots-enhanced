@@ -55,11 +55,12 @@ export const DeviceContainer = ({
         top: `${device.y}%`,
         transform: "translateX(-50%)",
         zIndex,
+        pointerEvents: isInteractive ? undefined : "none",
         filter: getDropShadowFilter(device.shadow),
         perspective: is3D ? "1200px" : undefined,
       }}
       onMouseDown={isInteractive ? onMouseDown : undefined}
-      onClick={(e) => e.stopPropagation()}
+      onClick={(event) => { if (isInteractive) event.stopPropagation(); }}
     >
       <div
         className="relative"

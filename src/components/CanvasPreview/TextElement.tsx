@@ -92,12 +92,13 @@ export const TextElement = ({
         wordWrap: "break-word",
         overflowWrap: "break-word",
         zIndex: Z_INDEX.text,
+        pointerEvents: isInteractive ? undefined : "none",
         padding: "4px",
         borderRadius: "4px",
         ...getTextSelectionStyles(isSelected),
       }}
       onMouseDown={isInteractive ? onMouseDown : undefined}
-      onClick={(e) => e.stopPropagation()}
+      onClick={(event) => { if (isInteractive) event.stopPropagation(); }}
       dangerouslySetInnerHTML={{ __html: normalizedContent }}
     />
   );

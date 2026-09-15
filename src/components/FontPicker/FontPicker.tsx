@@ -11,7 +11,8 @@
  * - Animated transitions
  */
 
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { CustomFont } from "../../types";
 import { googleFonts } from "../../lib/google-fonts";
 import { FontPickerHeader } from "./FontPickerHeader";
@@ -69,6 +70,18 @@ export const FontPicker = ({
   const matchingCustomFonts = customFonts.filter((font) =>
     font.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+  useEffect(() => {
+    if (!isOpen) return;
+    const previouslyFocused = document.activeElement;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { event.preventDefault(); onClose(); }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus();
+    };
+  }, [isOpen, onClose]);
 
   const handleUpload = async (file: File) => {
     setUploadError("");
@@ -102,9 +115,9 @@ export const FontPicker = ({
   // Don't render if not open
   if (!isOpen) return null;
 
-  return (
-    <div className={STYLES.backdrop}>
-      <div className={STYLES.modal} onClick={(e) => e.stopPropagation()}>
+  return createPortal(
+    <div className={STYLES.backdrop} onClick={onClose}>
+      <div role="dialog" aria-modal="true" aria-label="Select a Font" className={STYLES.modal} onClick={(e) => e.stopPropagation()}>
         <FontPickerHeader onClose={onClose} />
 
         <SearchInput value={searchQuery} onChange={setSearchQuery} />
@@ -150,6 +163,7 @@ export const FontPicker = ({
 
         <FontPickerFooter onCancel={onClose} />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };

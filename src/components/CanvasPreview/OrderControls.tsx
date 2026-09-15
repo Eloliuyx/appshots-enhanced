@@ -18,7 +18,8 @@ export const OrderControls = ({
   onReorderPointerDown,
 }: OrderControlsProps) => (
   <div
-    className="absolute left-2 top-2 z-20 flex items-center overflow-hidden rounded-lg border border-white/15 bg-black/60 text-white shadow-lg backdrop-blur-sm"
+    data-editor-control="true"
+    className="absolute left-2 top-2 z-[1000] flex items-center overflow-hidden rounded-lg border border-white/15 bg-black/60 text-white shadow-lg backdrop-blur-sm"
     onClick={(event) => event.stopPropagation()}
     onMouseDown={(event) => event.stopPropagation()}
   >
