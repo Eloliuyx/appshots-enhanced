@@ -1,8 +1,84 @@
 /** @vitest-environment jsdom */
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EditorProvider, useEditor } from "./EditorContext";
+import type { Screenshot } from "../types";
+
+const InsertionHarness = () => {
+  const { screenshots, activeScreenshotId, setActiveScreenshotId, addScreenshot, undo, redo } = useEditor();
+  return <>
+    <output data-testid="screenshots">{JSON.stringify(screenshots)}</output>
+    <output data-testid="active-id">{activeScreenshotId}</output>
+    {screenshots.map((screenshot, index) => <button key={screenshot.id} onClick={() => setActiveScreenshotId(screenshot.id)}>Select {index + 1}</button>)}
+    <button onClick={() => setActiveScreenshotId("missing")}>Select missing</button>
+    <button onClick={addScreenshot}>Add</button>
+    <button onClick={undo}>Undo</button>
+    <button onClick={redo}>Redo</button>
+  </>;
+};
+
+const readScreenshots = (): Screenshot[] => JSON.parse(screen.getByTestId("screenshots").textContent ?? "[]") as Screenshot[];
+
+describe("new screenshot insertion", () => {
+  beforeEach(() => localStorage.clear());
+  afterEach(() => { cleanup(); vi.useRealTimers(); });
+
+  const prepareThreeScreenshots = () => {
+    render(<EditorProvider><InsertionHarness /></EditorProvider>);
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    return readScreenshots();
+  };
+
+  it.each([0, 1, 2])("inserts after selected screenshot at index %i and preserves existing content", (selectedIndex) => {
+    const original = prepareThreeScreenshots();
+    fireEvent.click(screen.getByRole("button", { name: `Select ${selectedIndex + 1}` }));
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    const result = readScreenshots();
+    const inserted = result[selectedIndex + 1];
+    expect(result).toHaveLength(4);
+    expect(result.slice(0, selectedIndex + 1)).toEqual(original.slice(0, selectedIndex + 1));
+    expect(result.slice(selectedIndex + 2)).toEqual(original.slice(selectedIndex + 1));
+    expect(original.some(screenshot => screenshot.id === inserted.id)).toBe(false);
+    expect(screen.getByTestId("active-id").textContent).toBe(inserted.id);
+  });
+
+  it("places repeated additions after the newly selected screenshot", () => {
+    const original = prepareThreeScreenshots();
+    fireEvent.click(screen.getByRole("button", { name: "Select 1" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    const firstNewId = screen.getByTestId("active-id").textContent;
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    const secondNewId = screen.getByTestId("active-id").textContent;
+    expect(readScreenshots().map(screenshot => screenshot.id)).toEqual([original[0].id, firstNewId, secondNewId, original[1].id, original[2].id]);
+  });
+
+  it("restores the original order and selection on undo, and the insertion on redo", () => {
+    vi.useFakeTimers();
+    const original = prepareThreeScreenshots();
+    act(() => vi.advanceTimersByTime(1000));
+    fireEvent.click(screen.getByRole("button", { name: "Select 2" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    const inserted = readScreenshots();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(readScreenshots()).toEqual(original);
+    expect(screen.getByTestId("active-id").textContent).toBe(original[1].id);
+    fireEvent.click(screen.getByRole("button", { name: "Redo" }));
+    expect(readScreenshots()).toEqual(inserted);
+    expect(screen.getByTestId("active-id").textContent).toBe(inserted[2].id);
+  });
+
+  it("safely appends if the selected screenshot is no longer present", () => {
+    const original = prepareThreeScreenshots();
+    fireEvent.click(screen.getByRole("button", { name: "Select missing" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    const result = readScreenshots();
+    expect(result).toHaveLength(4);
+    expect(result.slice(0, 3)).toEqual(original);
+    expect(screen.getByTestId("active-id").textContent).toBe(result[3].id);
+  });
+});
 
 const HistoryHarness = () => {
   const {

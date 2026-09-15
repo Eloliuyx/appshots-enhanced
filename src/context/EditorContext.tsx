@@ -1120,7 +1120,11 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
       devices: clonedDevices,
       activeDeviceId: clonedDevices[0]?.id ?? null,
     };
-    setScreenshots([...screenshots, newScreenshot]);
+    setScreenshotsState((current) => {
+      const selectedIndex = current.findIndex((screenshot) => screenshot.id === activeScreenshotId);
+      const insertionIndex = selectedIndex === -1 ? current.length : selectedIndex + 1;
+      return [...current.slice(0, insertionIndex), newScreenshot, ...current.slice(insertionIndex)];
+    });
     setActiveScreenshotId(newScreenshot.id);
   };
 
