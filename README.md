@@ -12,10 +12,6 @@ A local, browser-based workbench for App Store and Google Play marketing screens
 
 ## 视频演示 / Video demo
 
-**中文版操作演示 · 2 分 35 秒 · 含中文旁白。** 观看实际编辑操作：添加与替换设备图片、调整布局、编辑文字及管理截图。
-
-**Chinese walkthrough · 2 min 35 sec · Mandarin narration.** See the enhanced editor in use: adding and replacing device images, adjusting layouts, editing text, and managing screenshots.
-
 https://github.com/user-attachments/assets/74698402-7942-4cef-86d7-95a28e5bbae3
 
 建议全屏观看，并打开播放器声音以收听旁白。
