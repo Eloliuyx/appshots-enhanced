@@ -3,6 +3,7 @@ import {
   DEFAULT_DEVICE_SHADOW,
   createDeviceInstance,
   ensureDeviceInstances,
+  replaceDeviceScreenshot,
 } from "./device-instances";
 
 describe("createDeviceInstance", () => {
@@ -113,5 +114,41 @@ describe("ensureDeviceInstances", () => {
 
     expect(result.devices).toEqual([]);
     expect(result.activeDeviceId).toBeNull();
+  });
+});
+
+describe("replaceDeviceScreenshot", () => {
+  it("changes only the selected image and preserves its complete layout", () => {
+    const original = createDeviceInstance({
+      id: "device-a",
+      screenshotSrc: "data:image/png;base64,old",
+      x: 23,
+      y: 41,
+      scale: 72,
+      rotation: -8,
+      style: "3d",
+      rotateY: -21,
+      rotateX: 7,
+      shadow: {
+        enabled: true,
+        color: "#123456",
+        blur: 38,
+        offsetX: 4,
+        offsetY: 19,
+      },
+    });
+    const untouched = createDeviceInstance({ id: "device-b", x: 80 });
+
+    const result = replaceDeviceScreenshot(
+      [original, untouched],
+      original.id,
+      "data:image/png;base64,new",
+    );
+
+    expect(result[0]).toEqual({
+      ...original,
+      screenshotSrc: "data:image/png;base64,new",
+    });
+    expect(result[1]).toBe(untouched);
   });
 });

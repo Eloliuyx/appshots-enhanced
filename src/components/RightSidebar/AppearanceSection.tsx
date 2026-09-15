@@ -19,6 +19,7 @@ interface AppearanceSectionProps {
   onUpdateScreenshot: (updates: Partial<Screenshot>) => void;
   /** Open font picker handler */
   onOpenFontPicker: () => void;
+  fontDisplayName?: string;
 }
 
 /**
@@ -33,6 +34,7 @@ export const AppearanceSection = ({
   gradientPresets,
   onUpdateScreenshot,
   onOpenFontPicker,
+  fontDisplayName,
 }: AppearanceSectionProps) => (
   <SidebarSection title="Appearance">
     <div className="space-y-4">
@@ -58,8 +60,8 @@ export const AppearanceSection = ({
       <div>
         <label className="block text-xs text-gray-400 mb-1">Font Style</label>
         <button onClick={onOpenFontPicker} className={STYLES.dropdownButton}>
-          <span style={{ fontFamily: `'${screenshot.fontFamily}', sans-serif` }}>
-            {screenshot.fontFamily}
+          <span className="truncate" style={{ fontFamily: `'${screenshot.fontFamily}', sans-serif` }}>
+            {fontDisplayName ?? screenshot.fontFamily}
           </span>
           <ChevronDown size={16} className="text-gray-400" />
         </button>

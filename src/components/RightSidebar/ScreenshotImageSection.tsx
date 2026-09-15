@@ -32,7 +32,12 @@ export const ScreenshotImageSection = ({
       onClick={() => fileInputRef.current?.click()}
       className={STYLES.uploadButton}
     >
-      {device.screenshotSrc ? "Change Image" : "Upload Image"}
+      {device.screenshotSrc ? "Replace Image" : "Upload Image"}
     </button>
+    {device.screenshotSrc && (
+      <p className="mt-2 text-xs leading-5 text-zinc-500">
+        Keeps the current size, position, rotation, and layer.
+      </p>
+    )}
   </SidebarSection>
 );

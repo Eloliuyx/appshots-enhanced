@@ -31,6 +31,37 @@ export interface RenderOptions {
   fontWeight?: number;
 }
 
+export type RichTextAlignment = RenderOptions["textAlign"];
+
+/**
+ * Read the block alignment emitted by the contentEditable toolbar. The DOM
+ * preview honors these inline styles, so the canvas exporter must do the same.
+ */
+export function getRichTextAlignment(
+  html: string,
+  fallback: RichTextAlignment = "center",
+): RichTextAlignment {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`<div>${html}</div>`, "text/html");
+  const root = doc.body.firstElementChild;
+  if (!root) return fallback;
+
+  const elements = [root, ...Array.from(root.querySelectorAll("*"))];
+  for (const element of elements) {
+    const alignment =
+      (element as HTMLElement).style.textAlign || element.getAttribute("align");
+    if (
+      alignment === "left" ||
+      alignment === "center" ||
+      alignment === "right"
+    ) {
+      return alignment;
+    }
+  }
+
+  return fallback;
+}
+
 /**
  * Parse HTML string into styled segments
  */
@@ -64,7 +95,19 @@ export function parseRichText(html: string, defaultColor: string): StyledSegment
   }
 
   // Recursively walk the DOM tree
-  function walkNode(node: Node, state: StyleState) {
+  const pushNewline = (state: StyleState) => {
+    if (segments.length === 0 || segments.at(-1)?.text === "\n") return;
+    segments.push({
+      text: "\n",
+      bold: state.bold,
+      italic: state.italic,
+      underline: state.underline,
+      color: state.color,
+      backgroundColor: state.backgroundColor,
+    });
+  };
+
+  function walkNode(node: Node, state: StyleState, isRoot = false) {
     if (node.nodeType === Node.TEXT_NODE) {
       const text = node.textContent || "";
       if (text) {
@@ -83,6 +126,10 @@ export function parseRichText(html: string, defaultColor: string): StyledSegment
     if (node.nodeType === Node.ELEMENT_NODE) {
       const element = node as HTMLElement;
       const tagName = element.tagName.toLowerCase();
+      const isBlock =
+        !isRoot && ["div", "p", "li", "blockquote"].includes(tagName);
+
+      if (isBlock) pushNewline(state);
       
       // Clone state for children
       const childState: StyleState = { ...state };
@@ -132,14 +179,7 @@ export function parseRichText(html: string, defaultColor: string): StyledSegment
           }
           break;
         case "br":
-          segments.push({
-            text: "\n",
-            bold: state.bold,
-            italic: state.italic,
-            underline: state.underline,
-            color: state.color,
-            backgroundColor: state.backgroundColor,
-          });
+          pushNewline(state);
           return;
       }
 
@@ -147,6 +187,8 @@ export function parseRichText(html: string, defaultColor: string): StyledSegment
       for (const child of Array.from(node.childNodes)) {
         walkNode(child, childState);
       }
+
+      if (isBlock) pushNewline(childState);
     }
   }
 
@@ -156,7 +198,9 @@ export function parseRichText(html: string, defaultColor: string): StyledSegment
     underline: false,
     color: defaultColor,
     backgroundColor: null,
-  });
+  }, true);
+
+  while (segments.at(-1)?.text === "\n") segments.pop();
 
   return segments;
 }
@@ -218,7 +262,9 @@ export function renderRichText(
     ctx.fill();
   };
 
-  // Split segments into words while preserving styling
+  // Split segments into wrap opportunities while preserving styling. Browser
+  // layout can wrap CJK text without spaces, so the canvas exporter must do
+  // the same instead of treating an entire Chinese sentence as one word.
   interface Word {
     segments: StyledSegment[];
     width: number;
@@ -229,48 +275,78 @@ export function renderRichText(
   let currentWord: StyledSegment[] = [];
   let currentWordWidth = 0;
 
+  const flushCurrentWord = () => {
+    if (currentWord.length > 0) {
+      words.push({
+        segments: currentWord,
+        width: currentWordWidth,
+        isNewline: false,
+      });
+      currentWord = [];
+      currentWordWidth = 0;
+    }
+  };
+
+  const isCjkCharacter = (character: string) =>
+    /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(
+      character,
+    );
+
+  const appendToCurrentWord = (
+    segment: StyledSegment,
+    character: string,
+  ) => {
+    const previous = currentWord.at(-1);
+    if (
+      previous &&
+      previous.bold === segment.bold &&
+      previous.italic === segment.italic &&
+      previous.underline === segment.underline &&
+      previous.color === segment.color &&
+      previous.backgroundColor === segment.backgroundColor
+    ) {
+      previous.text += character;
+    } else {
+      currentWord.push({ ...segment, text: character });
+    }
+    currentWordWidth += measureSegment({ ...segment, text: character });
+  };
+
   for (const segment of segments) {
-    if (segment.text === "\n") {
-      // Push current word if any
-      if (currentWord.length > 0) {
-        words.push({ segments: currentWord, width: currentWordWidth, isNewline: false });
-        currentWord = [];
-        currentWordWidth = 0;
+    for (const character of Array.from(segment.text)) {
+      if (character === "\n") {
+        flushCurrentWord();
+        words.push({ segments: [], width: 0, isNewline: true });
+        continue;
       }
-      // Add newline marker
-      words.push({ segments: [], width: 0, isNewline: true });
-      continue;
-    }
 
-    // Split segment text by spaces
-    const parts = segment.text.split(/( )/);
-    
-    for (const part of parts) {
-      if (part === " ") {
-        // Space ends a word
-        if (currentWord.length > 0) {
-          words.push({ segments: currentWord, width: currentWordWidth, isNewline: false });
-          currentWord = [];
-          currentWordWidth = 0;
-        }
-        // Add space as its own word
-        const spaceSegment = { ...segment, text: " " };
-        const spaceWidth = measureSegment(spaceSegment);
-        words.push({ segments: [spaceSegment], width: spaceWidth, isNewline: false });
-      } else if (part) {
-        // Add to current word
-        const partSegment = { ...segment, text: part };
-        const partWidth = measureSegment(partSegment);
-        currentWord.push(partSegment);
-        currentWordWidth += partWidth;
+      if (/\s/u.test(character)) {
+        flushCurrentWord();
+        const spaceSegment = { ...segment, text: character };
+        words.push({
+          segments: [spaceSegment],
+          width: measureSegment(spaceSegment),
+          isNewline: false,
+        });
+        continue;
       }
+
+      if (isCjkCharacter(character)) {
+        flushCurrentWord();
+        const cjkSegment = { ...segment, text: character };
+        words.push({
+          segments: [cjkSegment],
+          width: measureSegment(cjkSegment),
+          isNewline: false,
+        });
+        continue;
+      }
+
+      appendToCurrentWord(segment, character);
     }
   }
 
-  // Don't forget the last word
-  if (currentWord.length > 0) {
-    words.push({ segments: currentWord, width: currentWordWidth, isNewline: false });
-  }
+  flushCurrentWord();
 
   // Group words into lines
   interface Line {

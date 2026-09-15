@@ -39,6 +39,8 @@ export const LeftSidebar = () => {
     setExportSizeId,
     handleExport,
     screenshots,
+    activeScreenshotId,
+    isExporting,
   } = useEditor();
 
   // Handle device selection with default color
@@ -71,7 +73,10 @@ export const LeftSidebar = () => {
           selectedSizeId={exportSizeId}
           screenshotCount={screenshots.length}
           onSizeSelect={setExportSizeId}
-          onExport={handleExport}
+          onExport={() => void handleExport()}
+          onExportCurrent={() => void handleExport(activeScreenshotId)}
+          currentScreenshotNumber={screenshots.findIndex((screen) => screen.id === activeScreenshotId) + 1}
+          isExporting={isExporting}
         />
       </div>
     </aside>

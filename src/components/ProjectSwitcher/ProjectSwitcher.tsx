@@ -16,6 +16,9 @@ import {
   ChevronDown,
   Pencil,
   Trash2,
+  Copy,
+  Download,
+  Upload,
   Check,
   X,
 } from "lucide-react";
@@ -31,7 +34,10 @@ interface ProjectItemProps {
   onSelect: () => void;
   onRename: (name: string) => void;
   onDelete: () => void;
+  onCopyInto: () => void;
   canDelete: boolean;
+  canCopyInto: boolean;
+  sourceProjectName: string;
 }
 
 const ProjectItem = ({
@@ -40,7 +46,10 @@ const ProjectItem = ({
   onSelect,
   onRename,
   onDelete,
+  onCopyInto,
   canDelete,
+  canCopyInto,
+  sourceProjectName,
 }: ProjectItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(project.name);
@@ -118,6 +127,22 @@ const ProjectItem = ({
       </div>
 
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        {canCopyInto && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const shouldCopy = window.confirm(
+                `Replace “${project.name}” with a copy of “${sourceProjectName}”?`,
+              );
+              if (shouldCopy) onCopyInto();
+            }}
+            className="p-1 hover:bg-zinc-700 rounded text-zinc-400 hover:text-violet-300"
+            title={`Copy ${sourceProjectName} into ${project.name}`}
+            aria-label={`Copy ${sourceProjectName} into ${project.name}`}
+          >
+            <Copy className="w-3.5 h-3.5" />
+          </button>
+        )}
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -157,6 +182,9 @@ export const ProjectSwitcher = () => {
     renameProject,
     deleteProject,
     switchProject,
+    copyProjectInto,
+    exportWorkspaceBackup,
+    importWorkspaceBackup,
   } = useEditor();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -164,6 +192,7 @@ export const ProjectSwitcher = () => {
   const [newProjectName, setNewProjectName] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const newProjectInputRef = useRef<HTMLInputElement>(null);
+  const backupInputRef = useRef<HTMLInputElement>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -203,6 +232,26 @@ export const ProjectSwitcher = () => {
     } else if (e.key === "Escape") {
       setIsCreating(false);
       setNewProjectName("");
+    }
+  };
+
+  const handleBackupImport = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    try {
+      const count = await importWorkspaceBackup(file);
+      setIsOpen(false);
+      window.alert(
+        `Imported ${count} project${count === 1 ? "" : "s"}. Your existing projects were kept.`,
+      );
+    } catch (error) {
+      window.alert(
+        error instanceof Error ? error.message : "Could not import this backup.",
+      );
     }
   };
 
@@ -247,7 +296,10 @@ export const ProjectSwitcher = () => {
                 }}
                 onRename={(name) => renameProject(project.id, name)}
                 onDelete={() => deleteProject(project.id)}
+                onCopyInto={() => copyProjectInto(activeProjectId, project.id)}
                 canDelete={projects.length > 1}
+                canCopyInto={project.id !== activeProjectId}
+                sourceProjectName={activeProject.name}
               />
             ))}
           </div>
@@ -291,6 +343,34 @@ export const ProjectSwitcher = () => {
                 New Project
               </button>
             )}
+          </div>
+
+          <div className="grid grid-cols-2 border-t border-zinc-800">
+            <button
+              type="button"
+              onClick={exportWorkspaceBackup}
+              className="flex items-center justify-center gap-1.5 border-r border-zinc-800 px-2 py-2 text-xs text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white"
+              title="Download every project as an editable backup"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Backup
+            </button>
+            <input
+              ref={backupInputRef}
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(event) => void handleBackupImport(event)}
+            />
+            <button
+              type="button"
+              onClick={() => backupInputRef.current?.click()}
+              className="flex items-center justify-center gap-1.5 px-2 py-2 text-xs text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white"
+              title="Import an editable AppShots backup without replacing current projects"
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Import Backup
+            </button>
           </div>
         </div>
       )}

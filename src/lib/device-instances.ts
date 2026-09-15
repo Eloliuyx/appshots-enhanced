@@ -83,6 +83,20 @@ export const cloneDeviceInstance = (
     },
   });
 
+/**
+ * Replace only the pixels shown inside one device frame.
+ * Every layout value stays untouched so swapping a capture never moves or
+ * resizes the device on the canvas.
+ */
+export const replaceDeviceScreenshot = (
+  deviceInstances: DeviceInstance[],
+  deviceId: string,
+  screenshotSrc: string,
+): DeviceInstance[] =>
+  deviceInstances.map((device) =>
+    device.id === deviceId ? { ...device, screenshotSrc } : device,
+  );
+
 const isDeviceInstance = (value: unknown): value is Partial<DeviceInstance> =>
   typeof value === "object" && value !== null;
 

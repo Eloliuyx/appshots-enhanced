@@ -23,7 +23,7 @@ interface FontPickerHeaderProps {
  */
 export const FontPickerHeader = ({ onClose }: FontPickerHeaderProps) => (
   <div className="flex items-center justify-between p-4 border-b border-white/10">
-    <h2 className="text-lg font-semibold text-white">Select a Google Font</h2>
+    <h2 className="text-lg font-semibold text-white">Select a Font</h2>
     <button
       onClick={onClose}
       className={STYLES.iconButton}

@@ -6,6 +6,14 @@ export type DeviceColor = {
   screen: string;
 };
 
+export type CustomFont = {
+  /** Stable, collision-free CSS family. */
+  family: string;
+  name: string;
+  /** Embedded file keeps backups portable and works offline. */
+  dataUrl: string;
+};
+
 export type ShadowConfig = {
   enabled: boolean;
   color: string;

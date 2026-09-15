@@ -20,6 +20,9 @@ interface ExportSectionProps {
   onSizeSelect: (sizeId: string) => void;
   /** Handler for export action */
   onExport: () => void;
+  onExportCurrent: () => void;
+  currentScreenshotNumber: number;
+  isExporting: boolean;
 }
 
 /**
@@ -45,6 +48,9 @@ export const ExportSection = ({
   screenshotCount,
   onSizeSelect,
   onExport,
+  onExportCurrent,
+  currentScreenshotNumber,
+  isExporting,
 }: ExportSectionProps) => (
   <SidebarSection title="Export">
     {/* Size options */}
@@ -60,7 +66,15 @@ export const ExportSection = ({
     </div>
 
     {/* Export button */}
-    <button onClick={onExport} className={STYLES.primaryButton}>
+    <button
+      onClick={onExportCurrent}
+      disabled={isExporting || currentScreenshotNumber < 1}
+      className={`${STYLES.primaryButton} disabled:opacity-40 disabled:cursor-not-allowed`}
+    >
+      {isExporting ? "Exporting…" : `Export Current (#${currentScreenshotNumber})`}
+    </button>
+    <p className="mt-2 text-xs text-zinc-400">Select a screenshot on the canvas to export it as a PNG.</p>
+    <button onClick={onExport} disabled={isExporting} className={`${STYLES.primaryButton} disabled:opacity-40 disabled:cursor-not-allowed`}>
       Export All ({screenshotCount})
     </button>
   </SidebarSection>

@@ -247,6 +247,12 @@ export const gradientPresets: GradientPreset[] = [
 
 export const exportSizes: ExportSize[] = [
   {
+    id: "6.9",
+    label: "6.9 inch (iPhone 15 Pro Max)",
+    width: 1290,
+    height: 2796,
+  },
+  {
     id: "6.7",
     label: "6.7 inch (iPhone 13/12 Pro Max)",
     width: 1284,

@@ -36,6 +36,7 @@ A free, open-source tool to create stunning, high-converting screenshots for the
 - **Rich text editor** for every headline and subheadline — bold, italic, underline, text color, alignment (left/center/right), and text background highlights
 - **Rounded highlight styling** — highlighted text uses padded, rounded backgrounds that match in the editor, preview, and export
 - **Google Fonts integration** — search and preview hundreds of fonts
+- **Your own font files** — upload TTF, OTF, WOFF or WOFF2 files (up to 20 MB each) from Appearance → Font Style → Upload Font. The file is loaded before selection and export, stored locally, and embedded in workspace JSON backups. Uploads never go to GitHub or a font service. Each file is listed separately; upload regular/bold variants as separate choices. Only use fonts licensed for your intended use.
 - **Independent sizing** — separate font size sliders for headline and subheadline
 - **Width control** — set how wide each text block spans
 - **Drag-to-reposition** — click and drag headlines or subheadlines anywhere on the canvas
@@ -51,6 +52,7 @@ A free, open-source tool to create stunning, high-converting screenshots for the
 ### 📸 Screenshot Image
 
 - **Upload your app screenshots** — each device frame can display its own screen image
+- **Replace screen images in place** — uploading a replacement preserves the device's size, position, rotation and shadow
 
 ### 📐 Layout & Positioning
 
@@ -63,13 +65,17 @@ A free, open-source tool to create stunning, high-converting screenshots for the
 ### 📋 Project Management
 
 - **Multiple projects** — create, rename, switch between, and delete projects
-- **Auto-save** — all projects and settings persist to localStorage across sessions
+- **Auto-save** — projects, settings and custom fonts persist in localStorage and IndexedDB across sessions; IndexedDB also handles workspaces too large for localStorage
+- **Editable project copies** — copy an existing project's layers and settings into another project
+- **Workspace JSON backup / restore** — export editable projects, embedded images and custom fonts from the project menu; importing adds projects without replacing existing ones
+- **Finished PNG import** — recover downloaded artwork as flattened image layers (the original text/device layers cannot be recovered from PNGs)
 - **Reset to defaults** — clear everything and start fresh
 
 ### 📦 Export
 
+- **Single appshot export** — select a screenshot on the canvas, choose the export resolution, then click **Export Current (#N)** to download only that PNG. Its filename retains the screenshot's current position in the project. Neighboring device overflow stays intact, just like batch export.
 - **Batch export** — export all screenshots at once (ZIP for multiple, PNG for single)
-- **4 export size presets** — 6.7" iPhone, 6.5" iPhone, 5.5" iPhone, 12.9" iPad Pro
+- **5 export size presets** — 6.9" iPhone upload slot (1290 × 2796), 6.7" iPhone, 6.5" iPhone, 5.5" iPhone, 12.9" iPad Pro
 - **Full 3D support** — 3D perspective, edges, and shadows are preserved in exports
 - **Cross-screen layouts preserved** — multi-device overflow compositions export exactly like the on-canvas preview
 - **Pixel-perfect** — exported images match the on-screen preview
@@ -88,6 +94,10 @@ A free, open-source tool to create stunning, high-converting screenshots for the
 - **Dark mode UI** — sleek dark interface that's easy on the eyes
 
 ## 🚀 Quick Start
+
+### Keep your work safe
+
+Keep a long-lived checkout in a normal project folder (for example `Documents/AppShots Editor`) rather than relying on an app-internal working directory. Commit and push code to your own repository. Editable designs live in the browser, not in Git: regularly download a workspace JSON backup from the project menu, especially before changing browser, hostname or port, clearing browser data, or moving to another machine. Keep using the same URL (`http://127.0.0.1:5173/`) when restarting the workbench; `localhost` and other ports have separate browser storage.
 
 ### Prerequisites
 

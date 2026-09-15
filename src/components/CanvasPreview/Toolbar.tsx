@@ -4,7 +4,8 @@
  * Top toolbar for the canvas preview area with screenshot management controls.
  */
 
-import { Plus, Redo2, Undo2 } from "lucide-react";
+import { useRef } from "react";
+import { ImagePlus, Plus, Redo2, Undo2 } from "lucide-react";
 
 interface ToolbarProps {
   /** Callback to add a new screenshot */
@@ -15,6 +16,7 @@ interface ToolbarProps {
   canRedo: boolean;
   onUndo: () => void;
   onRedo: () => void;
+  onImportFinishedScreenshots: (files: File[]) => Promise<number>;
 }
 
 /**
@@ -36,7 +38,11 @@ export const Toolbar = ({
   canRedo,
   onUndo,
   onRedo,
-}: ToolbarProps) => (
+  onImportFinishedScreenshots,
+}: ToolbarProps) => {
+  const importInputRef = useRef<HTMLInputElement>(null);
+
+  return (
   <div className="h-14 border-b border-white/10 bg-[#141414] flex items-center px-4 gap-4">
     <div className="flex items-center gap-2">
       <button
@@ -45,6 +51,27 @@ export const Toolbar = ({
       >
         <Plus className="w-4 h-4" />
         Add Screenshot
+      </button>
+      <input
+        ref={importInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        multiple
+        className="hidden"
+        onChange={(event) => {
+          const files = Array.from(event.target.files ?? []);
+          event.target.value = "";
+          if (files.length > 0) void onImportFinishedScreenshots(files);
+        }}
+      />
+      <button
+        type="button"
+        onClick={() => importInputRef.current?.click()}
+        className="flex items-center gap-1.5 rounded-md border border-white/15 px-3 py-1.5 text-sm font-medium text-zinc-200 transition-colors hover:bg-white/10 hover:text-white"
+        title="Add exported PNGs as full, flattened screenshots"
+      >
+        <ImagePlus className="h-4 w-4" />
+        Import Finished PNGs
       </button>
     </div>
     <div className="h-5 w-px bg-white/10" />
@@ -75,4 +102,5 @@ export const Toolbar = ({
       {screenshotCount} screenshot{screenshotCount !== 1 ? "s" : ""}
     </span>
   </div>
-);
+  );
+};

@@ -51,6 +51,7 @@ export const CanvasPreview = () => {
     canRedo,
     undo,
     redo,
+    importFinishedScreenshots,
   } = useEditor();
   const [draggedScreenshotId, setDraggedScreenshotId] = useState<string | null>(
     null,
@@ -117,6 +118,7 @@ export const CanvasPreview = () => {
         canRedo={canRedo}
         onUndo={undo}
         onRedo={redo}
+        onImportFinishedScreenshots={importFinishedScreenshots}
       />
 
       {/* Preview area with horizontal scroll */}

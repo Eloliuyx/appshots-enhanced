@@ -19,6 +19,7 @@ import type {
   SelectedElement,
   TextLayer,
   TextLayerType,
+  CustomFont,
 } from "../types";
 import { devices, exportSizes, gradientPresets } from "../constants";
 import { exportScreenshots } from "../lib/export-utils";
@@ -28,13 +29,19 @@ import {
   ensureDeviceInstances,
   getDeviceColorById,
   getDeviceSpecById,
+  replaceDeviceScreenshot,
 } from "../lib/device-instances";
 import {
   loadPersistedState,
   useEditorPersistence,
   clearPersistedState,
+  CURRENT_VERSION,
+  type PersistedEditorState,
 } from "../lib/useLocalStorage";
+import { loadIndexedDbState } from "../lib/indexed-db-persistence";
 import { moveByOffset, reorderById } from "../lib/screenshot-order";
+import { copyProjectContent } from "../lib/project-copy";
+import { createCustomFont, loadCustomFont, normalizeCustomFonts } from "../lib/custom-fonts";
 import {
   createTextLayer,
   ensureTextLayers,
@@ -89,6 +96,11 @@ interface EditorContextType {
   renameProject: (id: string, name: string) => void;
   deleteProject: (id: string) => void;
   switchProject: (id: string) => void;
+  copyProjectInto: (sourceId: string, destinationId: string) => void;
+  exportWorkspaceBackup: () => void;
+  importWorkspaceBackup: (file: File) => Promise<number>;
+  customFonts: CustomFont[];
+  uploadCustomFont: (file: File) => Promise<string>;
 
   // State
   isFontPickerOpen: boolean;
@@ -136,6 +148,7 @@ interface EditorContextType {
   updateTextLayer: (id: string, updates: Partial<TextLayer>) => void;
   removeTextLayer: (id: string) => void;
   addScreenshot: () => void;
+  importFinishedScreenshots: (files: File[]) => Promise<number>;
   removeScreenshot: (id: string) => void;
   handleElementMouseDown: (
     e: React.MouseEvent,
@@ -164,7 +177,8 @@ interface EditorContextType {
   bringImageToFront: (imageId: string) => void;
   sendImageToBack: (imageId: string) => void;
   handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleExport: () => void;
+  handleExport: (screenshotId?: string) => Promise<void>;
+  isExporting: boolean;
   getBackgroundStyle: (screenshot: Screenshot) => string;
   resetEditor: () => void;
   canUndo: boolean;
@@ -329,6 +343,28 @@ const getInitialActiveProjectId = (projects: Project[]): string => {
   return projects[0]?.id || generateId();
 };
 
+const readFileAsDataUrl = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () =>
+      typeof reader.result === "string"
+        ? resolve(reader.result)
+        : reject(new Error(`Could not read ${file.name}`));
+    reader.onerror = () => reject(reader.error ?? new Error(`Could not read ${file.name}`));
+    reader.readAsDataURL(file);
+  });
+
+const getUniqueProjectName = (name: string, existingNames: Set<string>) => {
+  if (!existingNames.has(name)) return name;
+  let index = 1;
+  let candidate = `${name} (Imported)`;
+  while (existingNames.has(candidate)) {
+    index += 1;
+    candidate = `${name} (Imported ${index})`;
+  }
+  return candidate;
+};
+
 export const EditorProvider = ({ children }: { children: ReactNode }) => {
   // Project state
   const [projects, setProjects] = useState<Project[]>(getInitialProjects);
@@ -364,6 +400,27 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const [subheadlineFontSize, setSubheadlineFontSizeState] = useState(
     activeProject.subheadlineFontSize,
   );
+  const [isPersistenceReady, setIsPersistenceReady] = useState(false);
+  const [customFonts, setCustomFonts] = useState<CustomFont[]>(() =>
+    normalizeCustomFonts(persistedState?.customFonts),
+  );
+  const [isExporting, setIsExporting] = useState(false);
+  const exportInProgress = useRef(false);
+
+  useEffect(() => {
+    for (const font of customFonts) {
+      void loadCustomFont(font).catch((error) => {
+        console.error(`Could not load custom font ${font.name}:`, error);
+      });
+    }
+  }, [customFonts]);
+
+  const uploadCustomFont = async (file: File) => {
+    const font = await createCustomFont(file);
+    setCustomFonts((current) => current.some((item) => item.family === font.family)
+      ? current : [...current, font]);
+    return font.family;
+  };
 
   const createHistorySnapshot = useCallback(
     (): EditorHistorySnapshot => ({
@@ -445,6 +502,54 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     },
     [closeHistoryGroup],
   );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void loadIndexedDbState()
+      .then((indexedState) => {
+        if (cancelled) return;
+        const localLastSaved = persistedState?.lastSaved ?? 0;
+        if (
+          indexedState?.projects?.length &&
+          indexedState.lastSaved > localLastSaved
+        ) {
+          const recoveredProjects = indexedState.projects.map(normalizeProject);
+          const recoveredActive =
+            recoveredProjects.find(
+              (project) => project.id === indexedState.activeProjectId,
+            ) ?? recoveredProjects[0];
+
+          setProjects(recoveredProjects);
+          setCustomFonts(normalizeCustomFonts(indexedState.customFonts));
+          setActiveProjectId(recoveredActive.id);
+          setSelectedDeviceIdState(recoveredActive.selectedDeviceId);
+          setSelectedColorIdState(recoveredActive.selectedColorId);
+          setExportSizeIdState(recoveredActive.exportSizeId);
+          setScreenshotsState(recoveredActive.screenshots);
+          setActiveScreenshotIdState(recoveredActive.activeScreenshotId);
+          setHeadlineFontSizeState(recoveredActive.headlineFontSize);
+          setSubheadlineFontSizeState(recoveredActive.subheadlineFontSize);
+          setSelectedElement(null);
+          isApplyingHistoryRef.current = true;
+          resetHistory({
+            screenshots: recoveredActive.screenshots,
+            activeScreenshotId: recoveredActive.activeScreenshotId,
+            headlineFontSize: recoveredActive.headlineFontSize,
+            subheadlineFontSize: recoveredActive.subheadlineFontSize,
+          });
+        }
+        setIsPersistenceReady(true);
+      })
+      .catch((error) => {
+        console.error("Failed to recover editor state from IndexedDB:", error);
+        if (!cancelled) setIsPersistenceReady(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [resetHistory]);
 
   const restoreHistorySnapshot = useCallback(
     (snapshot: EditorHistorySnapshot) => {
@@ -598,6 +703,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   useEditorPersistence({
     projects,
     activeProjectId,
+    customFonts,
+    enabled: isPersistenceReady,
   });
 
   // Wrapper functions that update both local state and project
@@ -709,6 +816,153 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
       headlineFontSize: project.headlineFontSize,
       subheadlineFontSize: project.subheadlineFontSize,
     });
+  };
+
+  const copyProjectInto = (sourceId: string, destinationId: string) => {
+    if (sourceId === destinationId) return;
+
+    const storedSource = projects.find((project) => project.id === sourceId);
+    const destination = projects.find(
+      (project) => project.id === destinationId,
+    );
+    if (!storedSource || !destination) return;
+
+    const source =
+      sourceId === activeProjectId
+        ? {
+            ...storedSource,
+            screenshots,
+            selectedDeviceId,
+            selectedColorId,
+            exportSizeId,
+            activeScreenshotId,
+            headlineFontSize,
+            subheadlineFontSize,
+          }
+        : storedSource;
+    const copiedProject = copyProjectContent(source, destination);
+
+    setProjects((current) =>
+      current.map((project) =>
+        project.id === destinationId ? copiedProject : project,
+      ),
+    );
+    setActiveProjectId(destinationId);
+    setSelectedDeviceIdState(copiedProject.selectedDeviceId);
+    setSelectedColorIdState(copiedProject.selectedColorId);
+    setExportSizeIdState(copiedProject.exportSizeId);
+    setScreenshotsState(copiedProject.screenshots);
+    setActiveScreenshotIdState(copiedProject.activeScreenshotId);
+    setHeadlineFontSizeState(copiedProject.headlineFontSize);
+    setSubheadlineFontSizeState(copiedProject.subheadlineFontSize);
+    setSelectedElement(null);
+    isApplyingHistoryRef.current = true;
+    resetHistory({
+      screenshots: copiedProject.screenshots,
+      activeScreenshotId: copiedProject.activeScreenshotId,
+      headlineFontSize: copiedProject.headlineFontSize,
+      subheadlineFontSize: copiedProject.subheadlineFontSize,
+    });
+  };
+
+  const getCurrentProjects = () =>
+    projects.map((project) =>
+      project.id === activeProjectId
+        ? {
+            ...project,
+            screenshots,
+            selectedDeviceId,
+            selectedColorId,
+            exportSizeId,
+            activeScreenshotId,
+            headlineFontSize,
+            subheadlineFontSize,
+            updatedAt: Date.now(),
+          }
+        : project,
+    );
+
+  const exportWorkspaceBackup = () => {
+    const backup: PersistedEditorState & { format: string } = {
+      format: "appshots-workspace-backup",
+      version: CURRENT_VERSION,
+      projects: getCurrentProjects(),
+      activeProjectId,
+      lastSaved: Date.now(),
+      customFonts,
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `appshots-workspace-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  };
+
+  const importWorkspaceBackup = async (file: File): Promise<number> => {
+    const raw = JSON.parse(await file.text()) as Partial<PersistedEditorState> & {
+      format?: string;
+    };
+    if (!Array.isArray(raw.projects)) {
+      throw new Error("This file is not an AppShots workspace backup.");
+    }
+
+    const candidates = raw.projects.filter(
+      (project): project is Project =>
+        Boolean(
+          project &&
+            typeof project.id === "string" &&
+            typeof project.name === "string" &&
+            Array.isArray(project.screenshots) &&
+            project.screenshots.length > 0,
+        ),
+    );
+    if (candidates.length === 0) {
+      throw new Error("The backup does not contain any usable projects.");
+    }
+
+    const existingNames = new Set(projects.map((project) => project.name));
+    const importedProjects = candidates.map((project) => {
+      const name = getUniqueProjectName(project.name, existingNames);
+      existingNames.add(name);
+      return normalizeProject({
+        ...project,
+        id: generateId(),
+        name,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+    });
+    const first = importedProjects[0];
+
+    const importedFonts = normalizeCustomFonts(raw.customFonts);
+    await Promise.all(importedFonts.map(loadCustomFont));
+    setCustomFonts((current) => {
+      const families = new Set(current.map((font) => font.family));
+      return [...current, ...importedFonts.filter((font) => !families.has(font.family))];
+    });
+
+    setProjects((current) => [...current, ...importedProjects]);
+    setActiveProjectId(first.id);
+    setSelectedDeviceIdState(first.selectedDeviceId);
+    setSelectedColorIdState(first.selectedColorId);
+    setExportSizeIdState(first.exportSizeId);
+    setScreenshotsState(first.screenshots);
+    setActiveScreenshotIdState(first.activeScreenshotId);
+    setHeadlineFontSizeState(first.headlineFontSize);
+    setSubheadlineFontSizeState(first.subheadlineFontSize);
+    setSelectedElement(null);
+    isApplyingHistoryRef.current = true;
+    resetHistory({
+      screenshots: first.screenshots,
+      activeScreenshotId: first.activeScreenshotId,
+      headlineFontSize: first.headlineFontSize,
+      subheadlineFontSize: first.subheadlineFontSize,
+    });
+    return importedProjects.length;
   };
 
   const selectedDevice =
@@ -858,6 +1112,60 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     };
     setScreenshots([...screenshots, newScreenshot]);
     setActiveScreenshotId(newScreenshot.id);
+  };
+
+  const importFinishedScreenshots = async (files: File[]): Promise<number> => {
+    const sortedFiles = [...files]
+      .filter((file) => file.type.startsWith("image/"))
+      .sort((left, right) =>
+        left.name.localeCompare(right.name, undefined, { numeric: true }),
+      );
+    if (sortedFiles.length === 0) return 0;
+
+    const sources = await Promise.all(sortedFiles.map(readFileAsDataUrl));
+    const imported = sources.map((src): Screenshot => ({
+      id: generateId(),
+      textLayers: [],
+      headline: "",
+      subheadline: "",
+      backgroundColor: "#000000",
+      backgroundMode: "solid",
+      gradientPresetId: null,
+      textColor: "#ffffff",
+      headlineX: 50,
+      headlineY: 10,
+      headlineWidth: 80,
+      subheadlineX: 50,
+      subheadlineY: 18,
+      subheadlineWidth: 80,
+      fontFamily: activeScreenshot.fontFamily,
+      overlayImages: [
+        {
+          id: generateId(),
+          src,
+          x: 50,
+          y: 50,
+          width: 100,
+          height: 100,
+          layer: "front",
+          rotation: 0,
+          shadow: {
+            enabled: false,
+            color: "#000000",
+            blur: 0,
+            offsetX: 0,
+            offsetY: 0,
+          },
+        },
+      ],
+      devices: [],
+      activeDeviceId: null,
+    }));
+
+    setScreenshotsState((current) => [...current, ...imported]);
+    setActiveScreenshotIdState(imported.at(-1)?.id ?? activeScreenshotId);
+    setSelectedElement(null);
+    return imported.length;
   };
 
   const handleElementMouseDown = (
@@ -1257,10 +1565,10 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
       const result = reader.result;
       if (typeof result === "string") {
         updateActiveScreenshot({
-          devices: activeScreenshot.devices.map((device) =>
-            device.id === activeDevice.id
-              ? { ...device, screenshotSrc: result }
-              : device,
+          devices: replaceDeviceScreenshot(
+            activeScreenshot.devices,
+            activeDevice.id,
+            result,
           ),
         });
       }
@@ -1279,15 +1587,33 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     return screenshot.backgroundColor;
   };
 
-  const handleExport = () => {
-    void exportScreenshots({
-      screenshots,
-      exportSize,
-      previewDimensions,
-      headlineFontSize,
-      subheadlineFontSize,
-    });
-    setIsStarModalOpen(true);
+  const handleExport = async (screenshotId?: string) => {
+    if (exportInProgress.current || !isPersistenceReady) return;
+    exportInProgress.current = true;
+    setIsExporting(true);
+    try {
+      if (previewDimensions.width <= 0 || previewDimensions.height <= 0) {
+        throw new Error("Wait for the canvas to finish loading before exporting.");
+      }
+      const exportingScreens = screenshotId === undefined ? screenshots
+        : screenshots.filter((screen) => screen.id === screenshotId);
+      const families = new Set(exportingScreens.map((screen) => screen.fontFamily));
+      await Promise.all(customFonts.filter((font) => families.has(font.family)).map(loadCustomFont));
+      await exportScreenshots({
+        screenshots,
+        screenshotId,
+        exportSize,
+        previewDimensions,
+        headlineFontSize,
+        subheadlineFontSize,
+      });
+      setIsStarModalOpen(true);
+    } catch (error) {
+      window.alert(`Export failed: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      exportInProgress.current = false;
+      setIsExporting(false);
+    }
   };
 
   /**
@@ -1327,6 +1653,12 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         renameProject,
         deleteProject,
         switchProject,
+        copyProjectInto,
+        exportWorkspaceBackup,
+        importWorkspaceBackup,
+        customFonts,
+        uploadCustomFont,
+        isExporting,
 
         isFontPickerOpen,
         setIsFontPickerOpen,
@@ -1367,6 +1699,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         updateTextLayer,
         removeTextLayer,
         addScreenshot,
+        importFinishedScreenshots,
         removeScreenshot,
         handleElementMouseDown,
         handleElementMouseMove,

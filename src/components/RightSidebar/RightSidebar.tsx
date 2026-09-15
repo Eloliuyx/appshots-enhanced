@@ -40,6 +40,7 @@ export const RightSidebar = () => {
     subheadlineFontSize,
     setSubheadlineFontSize,
     setIsFontPickerOpen,
+    customFonts,
     fileInputRef,
     handleFileUpload,
     overlayImageInputRef,
@@ -131,6 +132,7 @@ export const RightSidebar = () => {
         />
 
         <AppearanceSection
+          fontDisplayName={customFonts.find((font) => font.family === activeScreenshot.fontFamily)?.name}
           screenshot={activeScreenshot}
           gradientPresets={gradientPresets}
           onUpdateScreenshot={updateActiveScreenshot}

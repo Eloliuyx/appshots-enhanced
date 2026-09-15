@@ -6,13 +6,15 @@ import type {
   DeviceInstance,
 } from "../types";
 import { gradientPresets } from "../constants";
-import { drawRichText } from "./rich-text-canvas";
+import { drawRichText, getRichTextAlignment } from "./rich-text-canvas";
 import { getDeviceColorById, getDeviceSpecById } from "./device-instances";
 import { getRenderableDevicesForScreenshot } from "./device-overflow";
 import JSZip from "jszip";
+import { getExportIndices } from "./export-selection";
 
 interface ExportOptions {
   screenshots: Screenshot[];
+  screenshotId?: string;
   exportSize: ExportSize;
   previewDimensions: { width: number; height: number };
   headlineFontSize: number;
@@ -895,6 +897,7 @@ const drawDeviceInstance = async (
 
 export const exportScreenshots = async ({
   screenshots,
+  screenshotId,
   exportSize,
   previewDimensions,
   headlineFontSize,
@@ -905,7 +908,7 @@ export const exportScreenshots = async ({
 
   const exportedFiles: { name: string; data: string }[] = [];
 
-  for (let i = 0; i < screenshots.length; i++) {
+  for (const i of getExportIndices(screenshots, screenshotId)) {
     const screenshot = screenshots[i];
     const filename = `appstore-screenshot-${i + 1}.png`;
 
@@ -993,11 +996,8 @@ export const exportScreenshots = async ({
     // Draw overlay images behind device
     await drawOverlayImages("behind");
 
-    const renderableDevices = getRenderableDevicesForScreenshot(screenshots, i);
-    for (const { device, localX } of renderableDevices) {
-      await drawDeviceInstance(ctx, canvas, device, scaleX, localX);
-    }
-
+    // Match the preview's layer order exactly: background images, text,
+    // devices, then foreground images.
     const fontFamily = `'${screenshot.fontFamily}', sans-serif`;
     const exportHeadlineFontSize = (headlineFontSize / 3) * scaleX;
     const exportSubheadlineFontSize = (subheadlineFontSize / 3) * scaleX;
@@ -1014,9 +1014,14 @@ export const exportScreenshots = async ({
         fontFamily,
         defaultColor: screenshot.textColor,
         lineHeight,
-        textAlign: "center",
+        textAlign: getRichTextAlignment(textLayer.content, "center"),
         fontWeight: textLayer.type === "headline" ? 700 : 600,
       });
+    }
+
+    const renderableDevices = getRenderableDevicesForScreenshot(screenshots, i);
+    for (const { device, localX } of renderableDevices) {
+      await drawDeviceInstance(ctx, canvas, device, scaleX, localX);
     }
 
     // Draw overlay images in front of device

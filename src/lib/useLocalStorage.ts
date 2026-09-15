@@ -6,7 +6,8 @@
  */
 
 import { useEffect, useCallback, useRef } from "react";
-import type { Project } from "../types";
+import type { Project, CustomFont } from "../types";
+import { saveIndexedDbState } from "./indexed-db-persistence";
 
 /**
  * Editor state that gets persisted to localStorage
@@ -20,10 +21,11 @@ export interface PersistedEditorState {
   activeProjectId: string;
   /** Timestamp of last save */
   lastSaved: number;
+  customFonts?: CustomFont[];
 }
 
 /** Current schema version for migration support */
-const CURRENT_VERSION = 2;
+export const CURRENT_VERSION = 2;
 
 /** localStorage key for editor state */
 const STORAGE_KEY = "app-screenshot-editor-state";
@@ -92,6 +94,9 @@ interface UseEditorPersistenceOptions {
   projects: Project[];
   /** Active project ID */
   activeProjectId: string;
+  /** Wait for IndexedDB recovery before writing new state. */
+  enabled?: boolean;
+  customFonts?: CustomFont[];
 }
 
 /**
@@ -104,6 +109,8 @@ interface UseEditorPersistenceOptions {
 export const useEditorPersistence = ({
   projects,
   activeProjectId,
+  enabled = true,
+  customFonts = [],
 }: UseEditorPersistenceOptions): void => {
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitialMount = useRef(true);
@@ -114,12 +121,18 @@ export const useEditorPersistence = ({
       projects,
       activeProjectId,
       lastSaved: Date.now(),
+      customFonts,
     };
     savePersistedState(state);
-  }, [projects, activeProjectId]);
+    void saveIndexedDbState(state).catch((error) => {
+      console.error("Failed to save editor state to IndexedDB:", error);
+    });
+  }, [projects, activeProjectId, customFonts]);
 
   // Debounced auto-save on state changes
   useEffect(() => {
+    if (!enabled) return;
+
     // Skip initial mount to avoid overwriting loaded state
     if (isInitialMount.current) {
       isInitialMount.current = false;
@@ -140,10 +153,12 @@ export const useEditorPersistence = ({
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [saveState]);
+  }, [enabled, saveState]);
 
   // Save immediately on page unload
   useEffect(() => {
+    if (!enabled) return;
+
     const handleBeforeUnload = () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
@@ -153,5 +168,5 @@ export const useEditorPersistence = ({
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [saveState]);
+  }, [enabled, saveState]);
 };

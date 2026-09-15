@@ -16,6 +16,8 @@ export const EditorLayout = () => {
     setIsStarModalOpen,
     activeScreenshot,
     updateActiveScreenshot,
+    customFonts,
+    uploadCustomFont,
   } = useEditor();
 
   const [showBanner, setShowBanner] = useState(true);
@@ -49,6 +51,8 @@ export const EditorLayout = () => {
         <CanvasPreview />
         <RightSidebar />
         <FontPicker
+          customFonts={customFonts}
+          onUpload={uploadCustomFont}
           isOpen={isFontPickerOpen}
           onClose={() => setIsFontPickerOpen(false)}
           selectedFontFamily={activeScreenshot.fontFamily}
