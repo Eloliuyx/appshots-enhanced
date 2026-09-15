@@ -1,6 +1,6 @@
 # AppShots Editor · 汉化增强版
 
-[中文说明](#中文说明) · [English guide](#english-guide) · [下载增强版 / Download](https://github.com/Eloliuyx/appshots_forked/archive/refs/heads/feature/multi-text-and-flexible-devices.zip)
+[中文说明](#中文说明) · [English guide](#english-guide) · [下载增强版 / Download](https://github.com/Eloliuyx/appshots_forked/archive/refs/heads/master.zip)
 
 一个在本地浏览器中使用的 App Store / Google Play 宣传截图工作台，支持中英文界面、灵活图层、自定义字体、单张导出，以及更顺手的选择、排序和撤销操作。
 
@@ -12,11 +12,17 @@ A local, browser-based workbench for App Store and Google Play marketing screens
 
 ## 视频演示 / Video demo
 
-**中文版增强版视频：待添加。** 将演示启动工作台、编辑图层、切换语言、备份和导出的流程。
+**中文版操作演示 · 2 分 35 秒 · 含中文旁白。** 观看实际编辑操作：添加与替换设备图片、调整布局、编辑文字及管理截图。
 
-**Chinese-language demo of this enhanced fork: coming soon.** It will show launching the workbench, editing layers, switching languages, backing up, and exporting.
+**Chinese walkthrough · 2 min 35 sec · Mandarin narration.** See the enhanced editor in use: adding and replacing device images, adjusting layouts, editing text, and managing screenshots.
 
-<!-- Replace this placeholder with a real video link or GitHub-hosted video when available. Do not present the upstream live demo as this enhanced fork. -->
+https://github.com/user-attachments/assets/74698402-7942-4cef-86d7-95a28e5bbae3
+
+建议全屏观看，并打开播放器声音以收听旁白。视频保留完整演示，已压缩为适合网页播放的版本。
+
+Watch in full screen for readable controls, and enable sound for the narration. This web-friendly version preserves the complete walkthrough.
+
+[直接观看视频 / Open video](https://github.com/user-attachments/assets/74698402-7942-4cef-86d7-95a28e5bbae3)
 
 原项目的在线演示不包含本 fork 的全部增强功能，因此不再把它作为本版本的 Live Demo。无需部署网站即可使用下方的本地工作台。
 
@@ -55,7 +61,7 @@ iPhone、iPad、Samsung 手机和平板设备框；设备配色；平面与 3D �
 **不需要账号、API key、Supabase、Vercel 或网站部署。** 这是本地工作台，不是需要注册的在线服务。
 
 1. 安装 [Node.js](https://nodejs.org/en/download/)：推荐 Node.js 24 LTS，也支持 Node.js 22.12+。Node.js 安装包含 npm；原 README 的 Node.js 18 要求不适用于当前 Vite 7。[Vite 7 版本要求](https://v7.vite.dev/guide/migration)。
-2. [下载增强版 ZIP](https://github.com/Eloliuyx/appshots_forked/archive/refs/heads/feature/multi-text-and-flexible-devices.zip)，解压到长期保存的文件夹，例如「文稿 / AppShots Editor」。不要只下载一个 .command 文件，也不要把项目一直放在临时目录。
+2. [下载增强版 ZIP](https://github.com/Eloliuyx/appshots_forked/archive/refs/heads/master.zip)，解压到长期保存的文件夹，例如「文稿 / AppShots Editor」。不要只下载一个 .command 文件，也不要把项目一直放在临时目录。
 3. 在项目文件夹中，双击 **[Start AppShots.command](Start%20AppShots.command)**。
 4. 第一次启动会自动安装依赖，需要联网。之后启动本地服务，并在默认浏览器打开 **<http://127.0.0.1:5173/>**。如果该地址已经有服务运行，启动文件会直接打开它。
 5. 使用时保持终端进程运行；结束时在终端按 Ctrl+C 停止服务。下次双击同一个文件即可再次打开。
@@ -72,10 +78,10 @@ chmod +x "Start AppShots.command"
 
 ### 终端启动：macOS / Windows / Linux
 
-需要 Node.js 和 Git。当前增强版在 **feature/multi-text-and-flexible-devices** 分支，以下命令明确下载该分支，避免拿到旧的 master 版本：
+需要 Node.js 和 Git。**master** 是本 fork 的稳定增强版及默认分支，以下命令下载该版本：
 
 ~~~bash
-git clone --branch feature/multi-text-and-flexible-devices https://github.com/Eloliuyx/appshots_forked.git
+git clone https://github.com/Eloliuyx/appshots_forked.git
 cd appshots_forked
 npm install --no-package-lock --legacy-peer-deps
 npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
@@ -151,7 +157,7 @@ This fork also supports devices extending into adjacent screenshots, preserving 
 **No account, API key, Supabase, Vercel, or website deployment is required.** This is a local workbench, not a hosted service you need to sign up for.
 
 1. Install [Node.js](https://nodejs.org/en/download/). Node.js 24 LTS is recommended; Node.js 22.12+ is also supported. npm is included. The old README's Node.js 18 requirement is not sufficient for Vite 7. See [Vite 7 requirements](https://v7.vite.dev/guide/migration).
-2. [Download the enhanced fork as a ZIP](https://github.com/Eloliuyx/appshots_forked/archive/refs/heads/feature/multi-text-and-flexible-devices.zip) and extract it into a permanent folder such as Documents/AppShots Editor. Download the whole project, not just the .command file; avoid temporary folders.
+2. [Download the enhanced fork as a ZIP](https://github.com/Eloliuyx/appshots_forked/archive/refs/heads/master.zip) and extract it into a permanent folder such as Documents/AppShots Editor. Download the whole project, not just the .command file; avoid temporary folders.
 3. Double-click **[Start AppShots.command](Start%20AppShots.command)** inside the project.
 4. The first launch installs dependencies and needs internet access. The launcher starts the local server and opens **<http://127.0.0.1:5173/>** in your default browser. If a server is already running there, it opens the existing page.
 5. Keep the Terminal process running while editing. Press Ctrl+C in Terminal when finished. Double-click the same file next time.
@@ -168,10 +174,10 @@ If macOS warns the file came from the internet, allow it through the system prom
 
 ### Terminal: macOS / Windows / Linux
 
-Install Node.js and Git first. The enhanced version currently lives on **feature/multi-text-and-flexible-devices**. These commands select that branch instead of the older master version:
+Install Node.js and Git first. **master** is this fork's stable enhanced version and default branch. These commands download that version:
 
 ~~~bash
-git clone --branch feature/multi-text-and-flexible-devices https://github.com/Eloliuyx/appshots_forked.git
+git clone https://github.com/Eloliuyx/appshots_forked.git
 cd appshots_forked
 npm install --no-package-lock --legacy-peer-deps
 npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
