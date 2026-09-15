@@ -73,6 +73,34 @@ describe("editor interface language", () => {
     expect(translateMessage("en", "{0} screenshot", [1])).toBe("1 screenshot");
   });
 
+  it("creates localized screenshot and text-layer defaults without rewriting existing content", () => {
+    render(<LanguageProvider><EditorProvider><EditorLayout /><ArtworkProbe /></EditorProvider></LanguageProvider>);
+    const readArtwork = () => JSON.parse(screen.getByTestId("artwork").textContent ?? "[]") as {
+      headline: string; subheadline: string; textLayers: { content: string }[];
+    }[];
+    const original = readArtwork()[0];
+    fireEvent.click(screen.getByRole("button", { name: "中文" }));
+    fireEvent.click(screen.getByRole("button", { name: "添加截图" }));
+    expect(readArtwork()[0]).toEqual(original);
+    expect(readArtwork()[1].headline).toBe("新截图");
+    expect(readArtwork()[1].subheadline).toBe("在这里添加描述");
+    expect(readArtwork()[1].textLayers.map(layer => layer.content)).toEqual(["新截图", "在这里添加描述"]);
+    fireEvent.click(screen.getByRole("button", { name: "主标题" }));
+    expect(readArtwork()[1].textLayers.at(-1)?.content).toBe("新主标题");
+    fireEvent.click(screen.getByRole("button", { name: "副标题" }));
+    expect(readArtwork()[1].textLayers.at(-1)?.content).toBe("新副标题");
+    const chineseArtwork = screen.getByTestId("artwork").textContent;
+    fireEvent.click(screen.getByRole("button", { name: "EN" }));
+    expect(screen.getByTestId("artwork").textContent).toBe(chineseArtwork);
+    fireEvent.click(screen.getByRole("button", { name: "Add Screenshot" }));
+    expect(readArtwork()[2].headline).toBe("New Screenshot");
+    expect(readArtwork()[2].subheadline).toBe("Add your description here");
+    fireEvent.click(screen.getByRole("button", { name: "Headline" }));
+    expect(readArtwork()[2].textLayers.at(-1)?.content).toBe("New Headline");
+    fireEvent.click(screen.getByRole("button", { name: "Subheadline" }));
+    expect(readArtwork()[2].textLayers.at(-1)?.content).toBe("New Subheadline");
+  });
+
   it("translates font controls, empty states, and upload validation without changing font names", async () => {
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "zh");
     render(<LanguageProvider><FontPicker isOpen onClose={vi.fn()} selectedFontFamily="Inter"

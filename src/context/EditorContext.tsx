@@ -1033,6 +1033,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
       nextY += 10;
     }
     const layer = createTextLayer(type, {
+      content: t(type === "headline" ? "New Headline" : "New Subheadline"),
       y: Math.min(nextY, 82),
     });
     setScreenshotsState((current) =>
@@ -1092,9 +1093,9 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   ]);
 
   const addScreenshot = () => {
-    const headline = createTextLayer("headline", { content: "New Screenshot" });
+    const headline = createTextLayer("headline", { content: t("New Screenshot") });
     const subheadline = createTextLayer("subheadline", {
-      content: "Add your description here",
+      content: t("Add your description here"),
     });
     const clonedDevices = activeScreenshot.devices.map((device) =>
       cloneDeviceInstance(device, { id: generateId() }),
