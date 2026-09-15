@@ -1,240 +1,250 @@
-# 📱 App Store Screenshot Generator
+# AppShots Editor · 汉化增强版
 
-A free, open-source tool to create stunning, high-converting screenshots for the Apple App Store and Google Play Store in minutes. Design professional app previews with an intuitive drag-and-drop editor.
+[中文说明](#中文说明) · [English guide](#english-guide) · [下载增强版 / Download](https://github.com/Eloliuyx/appshots_forked/archive/refs/heads/feature/multi-text-and-flexible-devices.zip)
 
-🔗 **Live Demo:** [appshots.appstate.xyz](https://appshots.appstate.xyz/)
+一个在本地浏览器中使用的 App Store / Google Play 宣传截图工作台，支持中英文界面、灵活图层、自定义字体、单张导出，以及更顺手的选择、排序和撤销操作。
 
-![App Store Screenshot Generator](public/demo-image.png)
+A local, browser-based workbench for App Store and Google Play marketing screenshots, with an English/Chinese interface, flexible layers, custom fonts, individual exports, and improved selection, ordering, and undo.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.0-38B2AC?logo=tailwindcss)
+> 本仓库是 [oyeolamilekan/appshots](https://github.com/oyeolamilekan/appshots) 的独立增强 fork，原项目由 **Oye Olalekan Johnson** 创建。我们在原项目基础上增加汉化和编辑器改进，不是原作者的官方版本。原有 MIT 许可证及版权声明完整保留。
+>
+> This is an independently enhanced fork of [oyeolamilekan/appshots](https://github.com/oyeolamilekan/appshots), originally created by **Oye Olalekan Johnson**. It adds localization and editor improvements; it is not an official upstream release. The original MIT license and copyright notice are preserved.
 
-## ✨ Features
+## 视频演示 / Video demo
 
-### 📱 Device Frames
+**中文版增强版视频：待添加。** 将演示启动工作台、编辑图层、切换语言、备份和导出的流程。
 
-- **6 realistic device mockups** — iPhone 15 Pro Max, iPhone 15 Pro, iPhone 14, iPad Pro 12.9", Samsung Galaxy S24 Ultra, Samsung Galaxy Tab S9
-- **Multiple color options per device** — Black Titanium, Natural, Blue, White, and more
-- **Zero-to-many device compositions** — create text-only screenshots, or add, select, reorder, and style any number of independent devices
-- **Independent device instances** — each device keeps its own screen image, model, color, transform, 3D angles, and shadow
-- **Cross-screen device overflow** — drag devices past the left or right edge to continue them into adjacent screenshots
-- **Flat & 3D rendering modes** — toggle between a classic 2D frame and a perspective 3D view with visible device edges
-- **3D rotation controls** — adjust Rotate Y and Rotate X angles for the perfect perspective
-- **Accurate camera elements** — Dynamic Island, notch, and punch-hole camera matching each device
+**Chinese-language demo of this enhanced fork: coming soon.** It will show launching the workbench, editing layers, switching languages, backing up, and exporting.
 
-### 🎨 Backgrounds & Appearance
+<!-- Replace this placeholder with a real video link or GitHub-hosted video when available. Do not present the upstream live demo as this enhanced fork. -->
 
-- **Solid color backgrounds** with a full color picker
-- **Gradient presets** — Sunset, Ocean, Mint, Berry, Royal, Rose
-- **Global text color picker**
+原项目的在线演示不包含本 fork 的全部增强功能，因此不再把它作为本版本的 Live Demo。无需部署网站即可使用下方的本地工作台。
 
-### 📝 Rich Text & Fonts
+The upstream live demo does not contain all of this fork's enhancements, so it is no longer presented as this version's live demo. No website deployment is needed to use the local workbench below.
 
-- **Multiple text layers** — add any number of independent headlines and subheadlines to each screenshot
-- **Rich text editor** for every headline and subheadline — bold, italic, underline, text color, alignment (left/center/right), and text background highlights
-- **Rounded highlight styling** — highlighted text uses padded, rounded backgrounds that match in the editor, preview, and export
-- **Google Fonts integration** — search and preview hundreds of fonts
-- **Your own font files** — upload TTF, OTF, WOFF or WOFF2 files (up to 20 MB each) from Appearance → Font Style → Upload Font. The file is loaded before selection and export, stored locally, and embedded in workspace JSON backups. Uploads never go to GitHub or a font service. Each file is listed separately; upload regular/bold variants as separate choices. Only use fonts licensed for your intended use.
-- **Independent sizing** — separate font size sliders for headline and subheadline
-- **Width control** — set how wide each text block spans
-- **Drag-to-reposition** — click and drag headlines or subheadlines anywhere on the canvas
+## 中文说明
 
-### 🖼️ Overlay Images
+### 本 fork 新增了什么
 
-- **Unlimited overlay images** — upload badges, logos, arrows, or decorations
-- **Drag-to-reposition** and **resize** with width percentage control
-- **Rotation control** per image
-- **Layer management** — place behind or in front of the device, reorder with bring forward/backward/to-front/to-back
-- **Per-image shadow** — enable/disable with color, blur, and offset controls
+- **中英文界面切换**：顶部截图数量左边的「EN / 中文」切换菜单、按钮、说明、提示及字体窗口。记住语言选择，但不会翻译已有截图文案、项目名称、图片或字体名称。
+- **中文默认文案**：中文模式下添加截图，默认显示「新截图」「在这里添加描述」；新增文字图层显示「新主标题」「新副标题」。英文模式使用英文默认文案。
+- **撤销与重做**：使用顶部按钮，或 ⌘/Ctrl+Z、⌘/Ctrl+Shift+Z 恢复编辑操作。
+- **截图重新排序**：通过截图左上角的拖动手柄或左右按钮调整顺序。
+- **在选中截图右边添加**：点击「添加截图」，新截图紧接在当前选中截图右边，并自动成为选中项。
+- **一张截图，多组标题**：添加多个独立主标题和副标题，分别编辑内容、格式、宽度和位置。
+- **零个、一个或多个设备**：制作纯文字或图片版式，也可放置多个独立设备画面，各自保留图片、样式、位置、旋转和阴影。
+- **原位替换设备图片**：在「设备屏幕图片」中点击「替换图片」，保留设备大小、位置、旋转角度和阴影，不必重新排版。
+- **单张导出**：选中截图后，点击「导出当前截图（第 N 张）」，只下载该张 PNG；仍支持「导出全部」。
+- **上传自己的字体**：「外观 → 字体 → 上传字体」支持 TTF、OTF、WOFF、WOFF2，每个文件最大 20 MB。字体保存在浏览器本地，并包含在工作台备份中。不同文件分别列出；请使用已获授权的字体。
+- **项目之间可编辑复制**：将当前项目复制到另一个项目，保留文字、设备、图片和布局图层，而不是合成一张图片。替换目标项目之前会要求确认。
+- **可编辑工作台备份**：项目菜单「备份」下载 JSON，包含项目、图片和自定义字体；「导入备份」添加项目，不删除现有项目。
+- **成品图片导入**：「导入成品图片」将下载好的 PNG 等图片作为完整图片图层导入，不能还原原始文字和设备图层。
+- **更可靠的对象选择**：顶部编号按钮直接切换截图；右侧「图层」直接选择被遮挡的文字、设备或图片，无需先移开遮挡物。
+- **移动选中对象**：选择图层后，在当前截图任意位置拖动，仅移动该对象；也可输入 X/Y 百分比精确定位。关闭此模式后恢复画布直接选择。
+- **选择与弹窗修复**：减少图片留白区域拦截点击，修复字体窗口被画布图片盖住的问题。PNG 内部透明区域仍可能有矩形点击范围，重叠复杂时请使用「图层」。
+- **安静的编辑体验**：移除 GitHub Star 弹窗和宣传横幅；移除 TanStack 调试入口、检查器和 Shift+A 弹窗快捷键，不影响页面路由。
 
-### 📸 Screenshot Image
+### 保留的原项目能力
 
-- **Upload your app screenshots** — each device frame can display its own screen image
-- **Replace screen images in place** — uploading a replacement preserves the device's size, position, rotation and shadow
+iPhone、iPad、Samsung 手机和平板设备框；设备配色；平面与 3D 模式；纯色和渐变背景；富文本加粗、斜体、下划线、颜色、对齐及文字高亮；Google Fonts；叠加图片、旋转和阴影；实时画布；位置预设；多项目管理；多种导出尺寸。
 
-### 📐 Layout & Positioning
+本 fork 还支持设备跨相邻截图延伸，导出保留对应的裁切构图。工作台为深色界面，截图本身的背景和素材可以自由设计。
 
-- **8 position presets** — Centered, Bleed Bottom, Bleed Top, Float Center, Float Bottom, Tilt Left, Tilt Right, Perspective
-- **Device size** slider (scale %)
-- **Device vertical position** slider (offset %)
-- **Device rotation** (flat mode) or **3D rotation** (3D mode)
-- **Device shadow** — toggle on/off with color, blur, and vertical offset controls
+### 开始使用：macOS 双击启动
 
-### 📋 Project Management
+**不需要账号、API key、Supabase、Vercel 或网站部署。** 这是本地工作台，不是需要注册的在线服务。
 
-- **Multiple projects** — create, rename, switch between, and delete projects
-- **Auto-save** — projects, settings and custom fonts persist in localStorage and IndexedDB across sessions; IndexedDB also handles workspaces too large for localStorage
-- **English / Chinese interface** — use **EN / 中文** beside the screenshot count to translate editor controls, instructions, project menus and font dialogs. The choice is remembered on this browser origin. Screenshot artwork, project names, uploaded images and font names stay unchanged; no workspace migration is required.
-- **Localized starter text** — newly added screenshots and text layers use the current interface language. Switching languages never rewrites existing screenshot copy.
-- **Insert beside selection** — Add Screenshot inserts immediately after the selected screenshot and selects the new one. Existing screenshots keep their relative order; insertion supports undo and redo.
-- **Distraction-free workbench** — no TanStack debug launcher, inspector, or Shift+A shortcut in development or production. Routing itself remains unchanged.
-- **Editable project copies** — copy an existing project's layers and settings into another project
-- **Workspace JSON backup / restore** — export editable projects, embedded images and custom fonts from the project menu; importing adds projects without replacing existing ones
-- **Finished PNG import** — recover downloaded artwork as flattened image layers (the original text/device layers cannot be recovered from PNGs)
-- **Reset to defaults** — clear everything and start fresh
+1. 安装 [Node.js](https://nodejs.org/en/download/)：推荐 Node.js 24 LTS，也支持 Node.js 22.12+。Node.js 安装包含 npm；原 README 的 Node.js 18 要求不适用于当前 Vite 7。[Vite 7 版本要求](https://v7.vite.dev/guide/migration)。
+2. [下载增强版 ZIP](https://github.com/Eloliuyx/appshots_forked/archive/refs/heads/feature/multi-text-and-flexible-devices.zip)，解压到长期保存的文件夹，例如「文稿 / AppShots Editor」。不要只下载一个 .command 文件，也不要把项目一直放在临时目录。
+3. 在项目文件夹中，双击 **[Start AppShots.command](Start%20AppShots.command)**。
+4. 第一次启动会自动安装依赖，需要联网。之后启动本地服务，并在默认浏览器打开 **<http://127.0.0.1:5173/>**。如果该地址已经有服务运行，启动文件会直接打开它。
+5. 使用时保持终端进程运行；结束时在终端按 Ctrl+C 停止服务。下次双击同一个文件即可再次打开。
 
-### 📦 Export
+如果提示启动文件没有执行权限，在终端进入解压后的项目文件夹，再运行：
 
-- **Single appshot export** — select a screenshot on the canvas, choose the export resolution, then click **Export Current (#N)** to download only that PNG. Its filename retains the screenshot's current position in the project. Neighboring device overflow stays intact, just like batch export.
-- **Batch export** — export all screenshots at once (ZIP for multiple, PNG for single)
-- **5 export size presets** — 6.9" iPhone upload slot (1290 × 2796), 6.7" iPhone, 6.5" iPhone, 5.5" iPhone, 12.9" iPad Pro
-- **Full 3D support** — 3D perspective, edges, and shadows are preserved in exports
-- **Cross-screen layouts preserved** — multi-device overflow compositions export exactly like the on-canvas preview
-- **Pixel-perfect** — exported images match the on-screen preview
-- **Uninterrupted exports** — no post-export star popup or promotional banner in this fork; original MIT attribution remains in LICENSE
+~~~bash
+chmod +x "Start AppShots.command"
+~~~
 
-### 🖥️ Editor Experience
+如 macOS 提示文件来自互联网，请只在确认下载自本仓库后，按系统提示允许打开；不要关闭系统安全保护。若仍不能双击启动，使用下方终端启动方法。
 
-- **Multi-screenshot gallery** — add, remove, and navigate screenshots in a horizontal carousel
-- **Undo & redo** — recover editor changes with toolbar controls, `Cmd/Ctrl+Z`, and `Cmd/Ctrl+Shift+Z`
-- **Screenshot reordering** — drag screenshots into a new order or move them left and right with accessible controls
-- **Real-time preview** — all changes update instantly on the canvas
-- **Drag-and-drop** — reposition any element by dragging directly on the canvas
-- **Device manager** — add, select, remove, and reorder devices from the right sidebar
-- **Element selection** — click to select text, devices, or overlay images with visual feedback
-- **Explicit screenshot navigation** — numbered buttons above the canvas switch screenshots regardless of overlapping artwork
-- **Unified Layers panel** — select any text, device, or image without moving covering objects out of the way
-- **Move Selected mode** — after choosing a layer in Layers, drag anywhere in the active screenshot to move only that object. Turn the mode off to pick objects normally. X/Y percentage inputs offer exact placement without dragging.
-- **Contained image hit areas** — object-contain letterbox margins don't intercept clicks; PNG-internal transparent pixels may still have a rectangular hit area, so use Layers for overlapping transparent artwork
-- **Isolated canvas stacking** — font picker is portaled above artwork; screenshot management controls stay above all canvas objects
-- **Helpful rich-text tooltips** — formatting controls include hover/focus tooltips
-- **Dark mode UI** — sleek dark interface that's easy on the eyes
+**想有一个桌面的「AppShots工作台」入口？** 在 Finder 中选中项目内的 Start AppShots.command，选择「制作替身」，把替身移到桌面，并重命名为「AppShots工作台」。原始启动文件留在项目文件夹里；它依赖同目录的项目代码，不是独立应用。移动项目后，请重新制作替身。
 
-## 🚀 Quick Start
+### 终端启动：macOS / Windows / Linux
 
-### Keep your work safe
+需要 Node.js 和 Git。当前增强版在 **feature/multi-text-and-flexible-devices** 分支，以下命令明确下载该分支，避免拿到旧的 master 版本：
 
-Keep a long-lived checkout in a normal project folder (for example `Documents/AppShots Editor`) rather than relying on an app-internal working directory. Commit and push code to your own repository. Editable designs live in the browser, not in Git: regularly download a workspace JSON backup from the project menu, especially before changing browser, hostname or port, clearing browser data, or moving to another machine. Keep using the same URL (`http://127.0.0.1:5173/`) when restarting the workbench; `localhost` and other ports have separate browser storage.
+~~~bash
+git clone --branch feature/multi-text-and-flexible-devices https://github.com/Eloliuyx/appshots_forked.git
+cd appshots_forked
+npm install --no-package-lock --legacy-peer-deps
+npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
+~~~
 
-### Prerequisites
+然后打开 **<http://127.0.0.1:5173/>**。Windows 和 Linux 用户使用此方法，不使用 macOS 的 .command 文件。
 
-- [Bun](https://bun.sh/) (recommended) or Node.js 18+
+--legacy-peer-deps 用于兼容当前依赖中的旧版 React peer 声明；这是现有双击启动文件使用的安装方式。以后启动只需进入同一个项目文件夹，再运行最后一条命令。
 
-### Installation
+如果下载的是 ZIP，不需要 Git：在终端进入解压后的项目文件夹，执行以上安装和启动两条 npm 命令即可。
 
-```bash
-# Clone the repository
-git clone https://github.com/oyeolamilekan/appshots.git
-cd app-screenshot-generator
+### 工作台怎么用
 
-# Install dependencies
-bun install
+1. 在顶部选择「中文」或「EN」，再用左上角项目菜单新建或切换项目。
+2. 选中截图，点击「添加截图」在它右边增加一张；用编号按钮切换，用截图左上角按钮或手柄排序。
+3. 在右侧添加主标题、副标题、设备和叠加图片；在左侧选择当前设备型号、配色和导出尺寸。
+4. 每个设备分别上传屏幕图片。需要换图时使用「替换图片」，不重新建立设备图层。
+5. 用「图层」选择目标对象，再拖动或输入 X/Y 调整位置；文字工具栏可加粗、改色、对齐和高亮，字体窗口可上传字体。
+6. 选择导出尺寸，使用「导出当前截图」或「导出全部」。多张截图批量导出为 ZIP，单张为 PNG。请确认尺寸符合目标上传栏位的要求，参见 [Apple 官方截图规格](https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications)。
+7. 使用项目菜单「备份」保存可编辑 JSON，重要编辑完成后尤其建议备份。
 
-# Start the development server
-bun run dev
-```
+**项目复制**：先打开源项目，在项目菜单里找到目标项目，点击目标行的复制图标并确认替换。目标项目中的图层之后可独立修改。请先备份目标项目。
 
-The app will be available at `http://localhost:5173`
+### 设计保存在哪里？重要！
 
-### Personal workbench on macOS
+- 项目、截图图片和自定义字体自动保存在**当前浏览器的 localStorage / IndexedDB** 中，不是项目文件夹里的图片目录，也不是 GitHub 仓库中的文件。
+- 提交代码、更新 README、重新下载项目或把代码拷到另一台电脑，**不会同时备份可编辑设计**。
+- 更换浏览器、配置文件、主机名或端口，可能看到新的空工作台。localhost:5173、127.0.0.1:5173 和其他端口的存储彼此独立。请始终使用同一地址：**<http://127.0.0.1:5173/>**。
+- 更换浏览器或电脑、清除浏览器数据、更新项目之前，先下载「备份」JSON；在新环境中用「导入备份」恢复。
+- PNG 是最终成品，不能代替可编辑 JSON 备份。只有 PNG 时，可以导入为整张图片，无法恢复原有图层。
+- 本地运行不等于完全离线：安装依赖和加载 Google Fonts 需要网络；源码仍保留上游 Google Fonts 和 Vercel Analytics 集成。图片和字体通过本地文件读取保存在浏览器中，不会因为 Git 提交而上传到仓库。
 
-Double-click `Start AppShots.command` to start the private local workbench and
-open it at `http://127.0.0.1:5173`. Keep the Terminal window open while using
-the editor; closing it stops the local site. Nothing is deployed to the web.
+### 常见问题
 
-### Building for Production
+**只剩 My Project，原来的设计不见了？** 先检查是否使用了原来的浏览器、配置文件和完整地址。不要立刻清除浏览器数据或重置工作台。如果有 JSON，使用「导入备份」恢复。
 
-```bash
-bun run build
-```
+**端口 5173 被占用？** 启动文件会打开该端口已有的页面。若它不是 AppShots，请先停止占用端口的其他服务，再启动工作台。固定端口是为了避免误开另一套浏览器存储。
 
-The built files will be in the `dist/` directory.
+**点击总选中别的对象？** 使用右侧「图层」，再用「移动选中对象」或 X/Y 坐标。
 
-## 🛠️ Tech Stack
+**字体或图片可以直接商用吗？** 编辑器的 MIT 许可不替代字体、图片、商标和设备素材各自的授权；请自行确认使用权。
 
-- **Framework**: [React 19](https://react.dev/)
-- **Routing**: [TanStack Router](https://tanstack.com/router)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **UI Components**: [shadcn/ui](https://ui.shadcn.com/)
-- **Build Tool**: [Vite 7](https://vitejs.dev/)
-- **Testing**: [Vitest](https://vitest.dev/)
-- **Runtime**: [Bun](https://bun.sh/)
+## English guide
 
-## 📁 Project Structure
+### Enhancements in this fork
 
-```
-src/
-├── components/
-│   ├── CanvasPreview/       # Main canvas, screenshot cards, device container, overlays
-│   ├── DeviceFrame/         # Device mockups (flat 2D & 3D with edges)
-│   ├── FontPicker/          # Google Fonts search & selection
-│   ├── GitHubStarModal.tsx  # Post-export GitHub star modal
-│   ├── LeftSidebar/         # Device picker, color picker, export controls
-│   ├── ProjectSwitcher/     # Project management UI
-│   ├── RichTextEditor/      # Rich text formatting toolbar & editor
-│   ├── RightSidebar/        # Layout, appearance, content, device, overlay controls
-│   ├── EditorLayout.tsx     # Main editor layout shell
-│   └── ui/                  # shadcn/ui components
-├── context/
-│   └── EditorContext.tsx     # Global editor state & actions
-├── lib/
-│   ├── device-instances.ts  # Device instance helpers and legacy normalization
-│   ├── device-overflow.ts   # Cross-screen device overflow calculations
-│   ├── export-utils.ts      # Canvas-based screenshot export (flat & 3D)
-│   ├── google-fonts.ts      # Google Fonts API loader
-│   ├── rich-text-canvas.ts  # Rich text rendering for canvas export
-│   └── useLocalStorage.ts   # Persistence hooks
-├── routes/
-│   ├── __root.tsx           # Root layout
-│   └── index.tsx            # Home page
-├── types/                   # TypeScript type definitions
-├── constants.ts             # Device specs, gradients, export sizes
-├── main.tsx                 # Application entry point
-└── styles.css               # Global styles
-```
+- **English/Chinese interface** — EN / 中文 beside the screenshot count translates menus, buttons, instructions, messages, and the font dialog. The choice is remembered. Existing artwork, project names, images, and font names are not translated.
+- **Localized starter text** — new screenshots use “新截图 / 在这里添加描述” in Chinese mode and “New Screenshot / Add your description here” in English mode. Newly added headline/subheadline layers also use the current language.
+- **Undo and redo** — toolbar controls, Cmd/Ctrl+Z, and Cmd/Ctrl+Shift+Z.
+- **Screenshot reordering** — drag the handle or use left/right controls.
+- **Insert after selection** — Add Screenshot inserts immediately to the right of the active screenshot and selects the new one.
+- **Multiple text layers** — independent headlines and subheadlines with separate content, formatting, widths, and positions.
+- **Zero-to-many devices** — device-free compositions or multiple independent devices, each with its own image, appearance, position, rotation, and shadow.
+- **Replace device images in place** — Replace Image preserves device size, position, rotation, and shadow without rebuilding the layout.
+- **Individual PNG export** — Export Current (#N) downloads only the selected appshot. Export All remains available.
+- **Your own fonts** — Appearance → Font Style → Upload Font supports TTF, OTF, WOFF, and WOFF2, up to 20 MB each. Fonts are saved in the browser and embedded in backups. Each uploaded file is listed separately; use properly licensed fonts.
+- **Editable project copies** — retain text, device, image, and layout layers when copying the current project into another. Destination replacement requires confirmation.
+- **Portable workspace backups** — Backup downloads editable JSON including projects, images, and fonts. Import Backup adds projects without deleting existing ones.
+- **Finished image import** — Import Finished PNGs adds exported images as flattened artwork; it cannot reconstruct original text/device layers.
+- **Reliable selection** — numbered screenshot navigation and Layers let you select covered objects without moving covering artwork.
+- **Move Selected mode** — select a layer, then drag anywhere on the active screenshot to move only that object, or use X/Y percentage coordinates. Turn it off to select directly on the canvas.
+- **Hit-area and modal fixes** — image letterboxing intercepts fewer clicks; artwork no longer covers the font picker. Transparent pixels inside PNGs may still have a rectangular hit area; use Layers for complex overlaps.
+- **An uninterrupted workbench** — no GitHub Star popup or promotional banner, and no TanStack debug launcher, inspector, or Shift+A popup shortcut. Routing still works normally.
 
-## 🎯 Usage
+### Original capabilities retained
 
-1. **Choose your composition** — keep a screenshot device-free or add one or more device frames
-2. **Select a device** — pick from iPhones, iPads, or Samsung devices in the left sidebar
-3. **Choose a color** — select a device frame color
-4. **Upload screenshots** — attach a different screen image to each device frame
-5. **Add text layers** — add as many headlines and subheadlines as you need, then format and position each one independently
-6. **Pick a font** — browse Google Fonts to find the perfect typeface
-7. **Set a background** — choose a solid color or gradient preset
-8. **Position the device** — use presets or manually adjust size, position, rotation, and shadow
-9. **Switch to 3D** — toggle to 3D mode and adjust perspective angles
-10. **Span screenshots** — drag devices past the left or right edge to continue them into adjacent screenshots
-11. **Add overlays** — upload badges, logos, or decorations and layer them around the device
-12. **Manage screenshots** — add more screenshots to create a complete set
-13. **Export** — download all screenshots at App Store resolution, then optionally star the project from the post-export modal
+iPhone, iPad, and Samsung phone/tablet frames; device colors; flat/3D rendering; solid/gradient backgrounds; rich text with bold, italic, underline, colors, alignment, and highlights; Google Fonts; overlay images, rotation, and shadows; live previews; position presets; multiple projects; and export size presets.
 
-## 🤝 Contributing
+This fork also supports devices extending into adjacent screenshots, preserving cropped compositions during export. The editor has a dark interface; artwork backgrounds and assets are your choice.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### macOS: double-click to launch
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+**No account, API key, Supabase, Vercel, or website deployment is required.** This is a local workbench, not a hosted service you need to sign up for.
 
-### Development Guidelines
+1. Install [Node.js](https://nodejs.org/en/download/). Node.js 24 LTS is recommended; Node.js 22.12+ is also supported. npm is included. The old README's Node.js 18 requirement is not sufficient for Vite 7. See [Vite 7 requirements](https://v7.vite.dev/guide/migration).
+2. [Download the enhanced fork as a ZIP](https://github.com/Eloliuyx/appshots_forked/archive/refs/heads/feature/multi-text-and-flexible-devices.zip) and extract it into a permanent folder such as Documents/AppShots Editor. Download the whole project, not just the .command file; avoid temporary folders.
+3. Double-click **[Start AppShots.command](Start%20AppShots.command)** inside the project.
+4. The first launch installs dependencies and needs internet access. The launcher starts the local server and opens **<http://127.0.0.1:5173/>** in your default browser. If a server is already running there, it opens the existing page.
+5. Keep the Terminal process running while editing. Press Ctrl+C in Terminal when finished. Double-click the same file next time.
 
-- Follow the existing code style
-- Write tests for new features
-- Update documentation as needed
-- Keep commits atomic and well-described
+If the file is not executable, open Terminal in the extracted project folder and run:
 
-## 📄 License
+~~~bash
+chmod +x "Start AppShots.command"
+~~~
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+If macOS warns the file came from the internet, allow it through the system prompts only after verifying it came from this repository. Do not disable system security protections. If double-clicking still fails, use the terminal instructions below.
 
-## 🙏 Acknowledgments
+**Want a desktop shortcut?** In Finder, select the project's Start AppShots.command, choose **Make Alias**, move the alias to your desktop, and rename it “AppShots Workbench.” Keep the original launcher inside the project: it depends on the code beside it and is not a standalone app. Recreate the alias if you move the project.
 
-- [TanStack](https://tanstack.com/) for the amazing router and devtools
-- [Tailwind CSS](https://tailwindcss.com/) for the utility-first CSS framework
-- [Lucide](https://lucide.dev/) for beautiful icons
-- [Google Fonts](https://fonts.google.com/) for the font library
+### Terminal: macOS / Windows / Linux
 
-## 📬 Contact
+Install Node.js and Git first. The enhanced version currently lives on **feature/multi-text-and-flexible-devices**. These commands select that branch instead of the older master version:
 
-- Create an [issue](https://github.com/oyeolamilekan/appshots/issues) for bug reports or feature requests
-- Star ⭐ this repo if you find it useful!
+~~~bash
+git clone --branch feature/multi-text-and-flexible-devices https://github.com/Eloliuyx/appshots_forked.git
+cd appshots_forked
+npm install --no-package-lock --legacy-peer-deps
+npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
+~~~
 
----
+Open **<http://127.0.0.1:5173/>**. Windows/Linux users should use this method rather than the macOS .command launcher.
 
-Made with ❤️ for iOS and Android developers
+--legacy-peer-deps accommodates older React peer declarations in current dependencies; the double-click launcher uses the same installation method. For later launches, enter the same project folder and run only the final command.
+
+If you downloaded the ZIP, Git is not required: open Terminal in the extracted folder and run the npm installation and start commands above.
+
+### Editing workflow
+
+1. Choose EN or 中文 at the top; create or switch projects using the project menu.
+2. Select a screenshot, then Add Screenshot to insert on its right. Use numbered navigation to switch, and handles/arrows to reorder.
+3. Add headlines, subheadlines, devices, and overlays on the right. Choose the active device's model, color, and export resolution on the left.
+4. Upload each device's screen image. Use Replace Image instead of rebuilding the layer when swapping images.
+5. Select objects in Layers, then drag or enter X/Y coordinates. Format text with bold, colors, alignment, and highlights; upload fonts in the font dialog.
+6. Choose an export size; use Export Current or Export All. Multiple screenshots export as ZIP; a single screenshot exports as PNG. Check the destination upload slot requirements; see [Apple's screenshot specifications](https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications).
+7. Download a workspace JSON Backup from the project menu, especially after important edits.
+
+**Copying projects:** open the source project, find the destination in the project menu, click its row's copy icon, and confirm replacement. Copied layers can then be edited independently. Back up the destination first.
+
+### Where designs are saved — important
+
+- Projects, images, and custom fonts auto-save in **the current browser's localStorage / IndexedDB**, not the checkout's image folders or GitHub files.
+- Committing code, updating the README, downloading again, or copying code to another computer **does not back up editable designs**.
+- Changing browser, profile, hostname, or port can open a separate empty workspace. localhost:5173, 127.0.0.1:5173, and other ports have separate storage. Keep using **<http://127.0.0.1:5173/>**.
+- Before changing browsers/computers, clearing browser data, or updating the project, download a JSON Backup. Use Import Backup to restore it in the new environment.
+- PNGs are finished artwork, not editable backups. They can be imported as whole images; original layers cannot be recovered.
+- Local hosting does not mean fully offline: dependency installation and Google Fonts require network access, and upstream Google Fonts/Vercel Analytics integrations remain in the source. Images/fonts are read locally and saved in the browser; committing code does not upload them to GitHub.
+
+### Troubleshooting
+
+**Only My Project appears and designs seem missing:** check the original browser, profile, and exact address first. Do not immediately clear browser data or reset the editor. Restore saved JSON using Import Backup if available.
+
+**Port 5173 is occupied:** the launcher opens whatever server is there. If it is not AppShots, stop that service before starting the workbench. A fixed port helps avoid opening separate browser storage by accident.
+
+**Clicks select the wrong object:** use Layers, then Move Selected or X/Y coordinates.
+
+**Can I use third-party fonts/images commercially?** The editor's MIT license does not replace separate rights for fonts, images, trademarks, or device assets. Verify permission for your intended use.
+
+## 开发与更新 / Development and updates
+
+更新之前先在工作台下载 JSON 备份，再在已有 checkout 中执行以下命令。保持同一个浏览器地址。
+
+Before updating, download a JSON backup in the editor, then run these commands in the existing checkout. Keep using the same browser address.
+
+~~~bash
+git pull --ff-only
+npm install --no-package-lock --legacy-peer-deps
+npm test
+npm run build
+~~~
+
+如本地有自己的代码修改，请先妥善保存，不要强制重置覆盖自己的工作。构建输出到 dist/；npm run preview 用于检查构建结果，换端口会使用另一套浏览器存储。
+
+Preserve local code changes before updating; do not force-reset your work. Build output goes to dist/. npm run preview serves the build for testing; changing ports also uses separate browser storage.
+
+技术栈 / Stack: React 19 · TypeScript · Vite 7 · Tailwind CSS 4 · TanStack Router · Lucide · Vitest. TanStack Router remains; its debug UI is disabled.
+
+## 反馈与贡献 / Feedback and contributions
+
+本 fork 目前尚未开启 Issues；欢迎通过 [本 fork 的 Pull Requests](https://github.com/Eloliuyx/appshots_forked/pulls) 提交改进和修复，目标请选择增强分支。原项目的贡献与历史请参阅 [上游仓库](https://github.com/oyeolamilekan/appshots)。
+
+Issues are not currently enabled on this fork. Improvements and fixes are welcome through [this fork's Pull Requests](https://github.com/Eloliuyx/appshots_forked/pulls); target the enhanced branch. See the [upstream repository](https://github.com/oyeolamilekan/appshots) for the original project's history.
+
+## 许可证与致谢 / License and credits
+
+[MIT License](LICENSE)。保留原作者 **Oye Olalekan Johnson** 的版权声明。感谢原作者及依赖维护者；汉化与增强工作在本 fork 中独立维护。
+
+[MIT License](LICENSE). The original copyright notice for **Oye Olalekan Johnson** is retained. Thanks to the upstream author and dependency maintainers; localization/enhancements are independently maintained in this fork.
+
+绿色渐变「文件夹＋放大镜」logo 来自原项目，不是本 fork 新设计的图标；源文件为 [public/favicon.png](public/favicon.png)，同目录的 logo192.png、logo512.png 是相同图片。
+
+The green gradient folder-and-magnifier logo comes from upstream, not a new design for this fork. Its source is [public/favicon.png](public/favicon.png); logo192.png and logo512.png contain the same artwork.
