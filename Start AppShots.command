@@ -2,7 +2,8 @@
 
 set -e
 
-cd -- "$(dirname -- "$0")"
+# Resolve desktop symlinks before locating the project beside this launcher.
+cd -- "${0:A:h}"
 
 if curl --silent --fail http://127.0.0.1:5173/ >/dev/null 2>&1; then
   open http://127.0.0.1:5173/
